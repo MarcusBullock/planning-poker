@@ -1,4 +1,5 @@
-stages: []
+stages:
+    - dummy_job
 
 dummy_job:
     script:
