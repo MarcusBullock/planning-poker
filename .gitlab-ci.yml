@@ -1,6 +1,7 @@
 stages:
-    - dummy_job
+    - skip
 
 dummy_job:
+    stage: skip
     script:
         - exit 0
