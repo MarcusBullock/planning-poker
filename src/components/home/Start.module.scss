@@ -1,0 +1,12 @@
+.start {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@media (max-width: 650px) {
+    .start {
+        width: 100%;
+    }
+}

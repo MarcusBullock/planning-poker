@@ -1,0 +1,14 @@
+.home {
+    display: flex;
+    flex-direction: row;
+    column-gap: 50px;
+    justify-content: center;
+    align-items: center;
+}
+
+@media (max-width: 650px) {
+    .home {
+        flex-direction: column;
+        row-gap: 35px;
+    }
+}

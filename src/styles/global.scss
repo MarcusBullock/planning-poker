@@ -1,0 +1,51 @@
+$primary-color: #007bff;
+$secondary-color: #28a745;
+
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #28a745;
+    --font-family: 'Inter', sans-serif;
+    --background-color: #f8f9fa;
+    --text-color: #333;
+    --button-background-color: #007bff;
+    --button-hover-color: darken(#007bff, 10%);
+    --transition-duration: 0.5s;
+    --navbar-text-color: #333;
+}
+
+[data-theme='dark'] {
+    --background-color: #333;
+    --text-color: #f8f9fa;
+    --button-background-color: #444;
+    --button-hover-color: darken(#444, 10%);
+    --navbar-text-color: #f8f9fa;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition:
+        background-color var(--transition-duration),
+        color var(--transition-duration);
+    min-width: 480px;
+}
+
+h1,
+h2,
+h3 {
+    font-weight: bold;
+}
+
+button {
+    cursor: pointer;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
