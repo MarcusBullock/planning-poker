@@ -1,12 +1,14 @@
 .join {
-    width: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    &:hover {
+        background-color: #f9daff;
+    }
 }
 
-@media (max-width: 650px) {
-    .join {
-        width: 100%;
+[data-theme='dark'] .join {
+    color: white;
+    border: 1px solid #ccc;
+
+    &:hover {
+        background-color: #9a7c7c;
     }
 }

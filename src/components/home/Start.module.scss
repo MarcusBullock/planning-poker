@@ -1,12 +1,14 @@
 .start {
-    width: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    &:hover {
+        background-color: #e1ffdd;
+    }
 }
 
-@media (max-width: 650px) {
-    .start {
-        width: 100%;
+[data-theme='dark'] .start {
+    color: white;
+    border: 1px solid #ccc;
+
+    &:hover {
+        background-color: #767f74;
     }
 }

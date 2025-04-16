@@ -1,7 +1,12 @@
+import CardButton from './CardButton';
 import styles from './Join.module.scss';
 
 function Join() {
-    return <div className={styles.join}>Join</div>;
+    return (
+        <CardButton className={styles.join} suit={'♣'} rank="K" onSubmit={() => {}}>
+            JOIN
+        </CardButton>
+    );
 }
 
 export default Join;
