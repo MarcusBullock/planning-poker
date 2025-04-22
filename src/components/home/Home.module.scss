@@ -1,15 +1,58 @@
 .home {
+    padding: 50px;
     display: flex;
-    flex-direction: row;
-    column-gap: 50px;
     justify-content: center;
     align-items: center;
-    margin-top: 40px;
+    overflow: hidden;
+    column-gap: 50px;
+
+    @media (max-width: 650px) {
+        flex-direction: column;
+        gap: 10px;
+    }
 }
 
-@media (max-width: 650px) {
-    .home {
-        flex-direction: column;
-        row-gap: 35px;
+.startFormWrapper {
+    width: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translateY(100%);
+    opacity: 0;
+    flex-grow: 0;
+    transition:
+        transform 0.5s ease,
+        opacity 0.5s ease,
+        height 0.5s ease;
+    margin: 0;
+    height: 0;
+
+    @media (max-width: 650px) {
+        transform: translateX(-100%);
+        height: auto;
+    }
+}
+
+.startFormWrapper.enter {
+    width: 40%;
+    transform: translateY(0);
+    opacity: 1;
+    height: 400px;
+    margin: 0;
+
+    @media (max-width: 650px) {
+        transform: translateX(0);
+        margin: 10px 0;
+    }
+}
+
+.startFormWrapper.exit {
+    transform: translateY(100%);
+    opacity: 0;
+    height: 0;
+    margin: 0;
+
+    @media (max-width: 650px) {
+        transform: translateX(-100%);
     }
 }

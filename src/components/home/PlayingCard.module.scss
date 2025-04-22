@@ -1,6 +1,6 @@
-.cardButton {
+.playingCard {
     background-color: #ffffff;
-    border: 1px solid black;
+    border: 1px solid #ffffff;
     box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.3);
     height: 400px;
     width: 290px;
@@ -9,8 +9,8 @@
     transition: transform 0.2s ease;
 
     &:hover {
-        animation: pulse 1.5s infinite; /* Add pulse animation */
-        transform: scale(1.1); /* Slightly increase the scale */
+        animation: pulse 1.5s infinite;
+        transform: scale(1.1);
     }
 
     &:active {
@@ -30,7 +30,7 @@
     }
 }
 
-.playingCard {
+.wrapper {
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -92,8 +92,9 @@
     }
 }
 
-[data-theme='dark'] .cardButton {
+[data-theme='dark'] .playingCard {
     background-color: #565151;
+    border: 1px solid #565151 !important;
 }
 
 [data-theme='dark'] .cardBody {
@@ -101,7 +102,7 @@
 }
 
 @media (max-width: 650px) {
-    .cardButton {
+    .playingCard {
         height: 330px;
         width: 230px;
     }

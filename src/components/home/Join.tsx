@@ -1,11 +1,11 @@
-import CardButton from './CardButton';
+import PlayingCard from './PlayingCard';
 import styles from './Join.module.scss';
 
 function Join() {
     return (
-        <CardButton className={styles.join} suit={'♣'} rank="K" onSubmit={() => {}}>
+        <PlayingCard className={styles.join} suit={'♣'} rank="K" onClick={() => {}}>
             JOIN
-        </CardButton>
+        </PlayingCard>
     );
 }
 

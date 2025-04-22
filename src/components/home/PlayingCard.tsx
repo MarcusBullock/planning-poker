@@ -1,22 +1,18 @@
 import classNames from 'classnames';
-import styles from './CardButton.module.scss';
+import styles from './PlayingCard.module.scss';
 
 interface CardButtonProps {
-    className?: string;
     children: React.ReactNode;
-    onSubmit: () => void;
     suit: string;
     rank: string;
+    className?: string;
+    onClick?: () => void;
 }
 
-function CardButton({ className, children, onSubmit, suit, rank }: CardButtonProps) {
+function PlayingCard({ onClick, rank, suit, children, className }: CardButtonProps) {
     return (
-        <button
-            className={classNames(className, styles.cardButton)}
-            type="submit"
-            onSubmit={onSubmit}
-        >
-            <div className={styles.playingCard}>
+        <div className={classNames(styles.playingCard, className)} onClick={onClick}>
+            <div className={styles.wrapper}>
                 <div className={classNames(styles.rankAndSuit, styles.top)}>
                     <div className={styles.rank}>{rank}</div>
                     <div className={classNames(styles.suit, styles.suitLeft)}>{suit}</div>
@@ -27,8 +23,8 @@ function CardButton({ className, children, onSubmit, suit, rank }: CardButtonPro
                     <div className={classNames(styles.rank, styles.rankRight)}>{rank}</div>
                 </div>
             </div>
-        </button>
+        </div>
     );
 }
 
-export default CardButton;
+export default PlayingCard;

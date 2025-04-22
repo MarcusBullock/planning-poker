@@ -1,0 +1,22 @@
+.startForm {
+    opacity: 0;
+    transform: scale(0.9);
+    background-color: #ffffff;
+    box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.3);
+    height: 400px;
+    width: 290px;
+    border-radius: 20px;
+    transition:
+        opacity 0.5s ease,
+        transform 0.5s ease;
+}
+
+.enter {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.exit {
+    opacity: 0;
+    transform: scale(0.9);
+}

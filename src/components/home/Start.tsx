@@ -1,11 +1,15 @@
-import CardButton from './CardButton';
+import PlayingCard from './PlayingCard';
 import styles from './Start.module.scss';
 
-function Start() {
+interface StartProps {
+    onClick: () => void;
+}
+
+function Start({ onClick }: StartProps) {
     return (
-        <CardButton className={styles.start} onSubmit={() => {}} suit={'♠'} rank="A">
+        <PlayingCard className={styles.start} onClick={onClick} suit={'♠'} rank="A">
             START
-        </CardButton>
+        </PlayingCard>
     );
 }
 
