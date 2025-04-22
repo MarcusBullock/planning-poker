@@ -1,3 +1,5 @@
+import { CardSuit } from '../../types/CardSuit';
+import PlayingCard from './PlayingCard';
 import styles from './StartForm.module.scss';
 
 interface StartFormProps {
@@ -7,7 +9,9 @@ interface StartFormProps {
 function StartForm({ isVisible }: StartFormProps) {
     return (
         <div className={`${styles.startForm} ${isVisible ? styles.enter : styles.exit}`}>
-            <h2>MEGA FORM</h2>
+            <PlayingCard suit={CardSuit.Hearts} rank="Q">
+                <input className={styles.input} placeholder="YOUR NAME" />
+            </PlayingCard>
         </div>
     );
 }
