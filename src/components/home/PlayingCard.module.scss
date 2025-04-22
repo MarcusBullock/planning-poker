@@ -1,6 +1,5 @@
 .playingCard {
     background-color: #ffffff;
-    border: 1px solid #ffffff;
     box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.3);
     height: 400px;
     min-width: 290px;
@@ -91,8 +90,7 @@
 }
 
 [data-theme='dark'] .playingCard {
-    background-color: #565151;
-    border: 1px solid #565151 !important;
+    background-color: #6c6b6b;
 }
 
 [data-theme='dark'] .cardBody {

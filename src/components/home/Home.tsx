@@ -1,9 +1,9 @@
 import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import Start from './Start';
 import Join from './Join';
 import StartForm from './StartForm';
 import JoinForm from './JoinForm';
-import classNames from 'classnames';
 import styles from './Home.module.scss';
 
 function Home() {
@@ -23,27 +23,38 @@ function Home() {
     };
 
     return (
-        <div
-            className={classNames(
-                styles.home,
-                startClicked || joinClicked ? styles.startFormVisible : '',
-            )}
-        >
+        <motion.div className={styles.home} layout transition={{ layout: { duration: 0.5 } }}>
             <Start onClick={() => click(true)} />
-            <div
-                className={`${styles.startFormWrapper} ${
-                    startClicked ? styles.enter : styles.exit
-                }`}
-            >
-                <StartForm isVisible={startClicked} />
-            </div>
-            <div
-                className={`${styles.startFormWrapper} ${joinClicked ? styles.enter : styles.exit}`}
-            >
-                <JoinForm isVisible={startClicked} />
-            </div>
+            <AnimatePresence>
+                {startClicked && (
+                    <motion.div
+                        className={styles.formCard}
+                        layout
+                        initial={{ width: 0, y: 500 }}
+                        animate={{ width: '300px', y: 0 }}
+                        exit={{ width: 0, y: 500, opacity: 0 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <StartForm />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+            <AnimatePresence>
+                {joinClicked && (
+                    <motion.div
+                        className={styles.formCard}
+                        layout
+                        initial={{ width: 0, y: 500 }}
+                        animate={{ width: '300px', y: 0 }}
+                        exit={{ width: 0, y: 500, opacity: 0 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <JoinForm />
+                    </motion.div>
+                )}
+            </AnimatePresence>
             <Join onClick={() => click(false)} />
-        </div>
+        </motion.div>
     );
 }
 
