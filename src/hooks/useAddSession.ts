@@ -5,7 +5,7 @@ import { Database } from "../types/supabase";
 type SessionInsert = Database["public"]["Tables"]["Session"]["Insert"];
 
 const addSession = async (session: SessionInsert): Promise<void> => {
-  const { error } = await supabase.from("session").insert(session);
+  const { error } = await supabase.from("Session").insert(session);
   if (error) throw new Error(error.message);
 };
 
@@ -15,7 +15,7 @@ export const useAddSession = () => {
   return useMutation({
     mutationFn: addSession,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["session"] });
+      queryClient.invalidateQueries({ queryKey: ["Session"] });
     },
   });
 };

@@ -1,13 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../clients/supabaseClient";
-import { Database } from "../types/supabase";
-
-export type UserInsert = Database["public"]["Tables"]["User"]["Insert"];
-export type UserRow = Database["public"]["Tables"]["User"]["Row"];
+import { UserInsert, UserRow } from "../types/DbModels";
 
 const addUser = async (user: UserInsert): Promise<UserRow> => {
   const { data, error } = await supabase
-    .from("user")
+    .from("User")
     .insert(user)
     .select()
     .single();
@@ -21,7 +18,7 @@ export const useAddUser = () => {
   return useMutation<UserRow, Error, UserInsert>({
     mutationFn: addUser,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["User"] });
     },
   });
 };

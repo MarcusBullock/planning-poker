@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAddUser, UserRow } from '../../hooks/useAddUser';
+import { useAddUser } from '../../hooks/useAddUser';
 import { useAddSession } from '../../hooks/useAddSession';
 import PlayingCard from './PlayingCard';
 import { CardSuit } from '../../types/CardSuit';
+import { UserRow } from '../../types/DbModels';
 import ButtonLoading from '../shared/ButtonLoading';
 import { nanoid } from 'nanoid';
 import styles from './StartForm.module.scss';
@@ -21,6 +22,11 @@ function StartForm() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (username.length > 50) {
+            alert('Please use less than 50 characters for username');
+            return;
+        }
 
         addUser(
             { name: username, created: new Date().toISOString() },
@@ -53,7 +59,7 @@ function StartForm() {
     return (
         <div className={styles.startForm}>
             <PlayingCard suit={CardSuit.Hearts} rank="Q">
-                <form>
+                <form onSubmit={(e) => handleSubmit(e)}>
                     <input
                         type="text"
                         placeholder="YOUR NAME"
@@ -61,13 +67,15 @@ function StartForm() {
                         onChange={(e) => setUsername(e.target.value)}
                         required
                     />
-                    <button type="submit" disabled={!!username || isPending} onClick={handleSubmit}>
+                    <button type="submit" disabled={!username || isPending || isSessionPending}>
                         {isPending || isSessionPending ? <ButtonLoading /> : 'START'}
                     </button>
+                    {(isError || isSessionError) && (sessionError?.message || error?.message) && (
+                        <p className={styles.error}>
+                            Error: {sessionError?.message || error?.message}
+                        </p>
+                    )}
                 </form>
-                {(isError || isSessionError) && (sessionError?.message || error?.message) && (
-                    <p className={styles.error}>Error: {sessionError?.message || error?.message}</p>
-                )}
             </PlayingCard>
         </div>
     );
