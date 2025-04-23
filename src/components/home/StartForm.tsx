@@ -6,7 +6,10 @@ function StartForm() {
     return (
         <div className={styles.startForm}>
             <PlayingCard suit={CardSuit.Hearts} rank="Q">
-                <input className={styles.input} placeholder="YOUR NAME" />
+                <form>
+                    <input placeholder="YOUR NAME" />
+                    <button type="button">START</button>
+                </form>
             </PlayingCard>
         </div>
     );

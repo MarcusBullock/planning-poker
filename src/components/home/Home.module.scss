@@ -2,12 +2,14 @@
     padding: 50px;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: start;
     overflow: hidden;
-    column-gap: 50px;
+    height: 100vh;
 
     @media (max-width: 650px) {
         flex-direction: column;
         row-gap: 50px;
+        align-items: center;
+        justify-content: start;
     }
 }

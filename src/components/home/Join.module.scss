@@ -1,5 +1,7 @@
 .join {
     cursor: pointer;
+    margin-left: 50px;
+
     &:hover {
         animation: pulse 1.5s infinite;
         transform: scale(1.1);
@@ -8,6 +10,10 @@
 
     &:active {
         transform: translateY(13px);
+    }
+
+    @media (max-width: 650px) {
+        margin-left: 0;
     }
 }
 

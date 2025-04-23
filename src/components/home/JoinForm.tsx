@@ -6,7 +6,10 @@ function JoinForm() {
     return (
         <div className={styles.joinForm}>
             <PlayingCard suit={CardSuit.Diamonds} rank="J">
-                <input className={styles.input} placeholder="ENTER CODE" />
+                <form>
+                    <input placeholder="ENTER CODE" />
+                    <button type="button">JOIN</button>
+                </form>
             </PlayingCard>
         </div>
     );

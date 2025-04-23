@@ -30,10 +30,13 @@ function Home() {
                     <motion.div
                         className={styles.formCard}
                         layout
-                        initial={{ width: 0, y: 500 }}
-                        animate={{ width: '300px', y: 0 }}
-                        exit={{ width: 0, y: 500, opacity: 0 }}
-                        transition={{ duration: 0.5 }}
+                        initial={{ width: 0, y: 1500, rotate: 0 }}
+                        animate={{ width: '300px', y: 0, rotate: 360 }}
+                        exit={{ width: 0, y: 1500, opacity: 0, rotate: 0 }}
+                        transition={{
+                            duration: 0.6,
+                            ease: [0.25, 0.1, 0.25, 1],
+                        }}
                     >
                         <StartForm />
                     </motion.div>
@@ -44,10 +47,13 @@ function Home() {
                     <motion.div
                         className={styles.formCard}
                         layout
-                        initial={{ width: 0, y: 500 }}
-                        animate={{ width: '300px', y: 0 }}
-                        exit={{ width: 0, y: 500, opacity: 0 }}
-                        transition={{ duration: 0.5 }}
+                        initial={{ width: 0, y: 1500, rotate: 0 }}
+                        animate={{ width: '300px', y: 0, rotate: 360 }}
+                        exit={{ width: 0, y: 1500, opacity: 0, rotate: 0 }}
+                        transition={{
+                            duration: 0.6,
+                            ease: [0.25, 0.1, 0.25, 1],
+                        }}
                     >
                         <JoinForm />
                     </motion.div>
