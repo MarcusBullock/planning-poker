@@ -1,0 +1,55 @@
+.createUser {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+
+    .mainForm {
+        display: flex;
+        flex-direction: column;
+        font-family: 'Rye', sans-serif;
+        border: 3px solid black;
+        border-radius: 45px;
+        padding: 30px;
+        background-color: #e8e8e8;
+
+        .welcome {
+            font-size: 24px;
+            margin: 0 0 35px 0;
+        }
+
+        P {
+            margin: 0 0 15px 0;
+        }
+
+        form {
+            display: flex;
+            flex-direction: row;
+            column-gap: 20px;
+            width: 300px;
+
+            input {
+                width: 100%;
+                padding: 10px;
+                border-radius: 15px;
+                font-family: 'CardCharacters', sans-serif;
+                color: #a43838;
+                text-align: center;
+                font-size: 20px;
+            }
+
+            input::placeholder {
+                color: rgb(171, 170, 170);
+                font-weight: normal;
+                font-size: 18px;
+            }
+
+            button {
+                border-radius: 20px;
+                font-family: 'CardCharacters', sans-serif;
+                background-color: #a17b7a;
+                color: #fffcfc;
+                padding: 10px 20px;
+            }
+        }
+    }
+}

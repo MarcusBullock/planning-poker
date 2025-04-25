@@ -2,6 +2,7 @@
     height: 100vh;
     width: 100%;
     overflow: visible;
+    padding: 0px 20px;
 
     .topRow {
         margin-top: 20px;
@@ -10,7 +11,6 @@
         justify-content: space-between;
         align-items: flex-start;
         column-gap: 20px;
-        padding: 0px 20px;
 
         h1 {
             font-family: 'Rye', serif;
@@ -19,12 +19,16 @@
             font-size: 2.5rem;
             color: #343356;
             margin: 0;
+
+            span {
+                text-transform: uppercase;
+            }
         }
 
         .overviewCol {
             display: flex;
             flex-direction: column;
-            row-gap: 10px;
+            row-gap: 5px;
 
             .owner {
                 border: 2px solid black;
@@ -69,6 +73,7 @@
                     border-radius: 50%;
                     padding: 10px 22px;
                     font-size: 20px;
+                    background-color: #e7e4e4;
 
                     &:hover {
                         background-color: #d5bebe;
@@ -83,6 +88,26 @@
 
         @media (max-width: 710px) {
             flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            row-gap: 30px;
         }
+    }
+}
+[data-theme='dark'] .topRow {
+    .overviewCol {
+        .owner {
+            background-color: #a9a5a5;
+        }
+    }
+
+    .btnRow {
+        button {
+            background-color: #a9a5a5;
+        }
+    }
+
+    h1 {
+        color: #fff;
     }
 }

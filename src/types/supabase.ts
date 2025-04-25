@@ -63,21 +63,60 @@ export type Database = {
           }
         ];
       };
+      SessionUser: {
+        Row: {
+          created: string;
+          id: number;
+          sessionCode: string;
+          userId: number;
+        };
+        Insert: {
+          created?: string;
+          id?: number;
+          sessionCode: string;
+          userId: number;
+        };
+        Update: {
+          created?: string;
+          id?: number;
+          sessionCode?: string;
+          userId?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "SessionUser_sessionCode_fkey";
+            columns: ["sessionCode"];
+            isOneToOne: false;
+            referencedRelation: "Session";
+            referencedColumns: ["code"];
+          },
+          {
+            foreignKeyName: "SessionUser_userId_fkey";
+            columns: ["userId"];
+            isOneToOne: false;
+            referencedRelation: "User";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       User: {
         Row: {
           created: string;
           id: number;
           name: string;
+          role: string;
         };
         Insert: {
           created?: string;
           id?: number;
           name: string;
+          role: string;
         };
         Update: {
           created?: string;
           id?: number;
           name?: string;
+          role?: string;
         };
         Relationships: [];
       };

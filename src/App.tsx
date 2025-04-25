@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 import Navbar from './components/navbar/Navbar';
 import Home from './components/home/Home';
-import SessionPage from './components/session/SessionPage';
+import SessionPageWrapper from './components/session/SessionPageWrapper';
 
 const App = () => {
     return (
@@ -10,8 +11,9 @@ const App = () => {
             <div className="container">
                 <Routes>
                     <Route path="/" element={<Home />} />
-                    <Route path="/session/:code" element={<SessionPage />} />
+                    <Route path="/session/:code" element={<SessionPageWrapper />} />
                 </Routes>
+                <ToastContainer />
             </div>
         </Router>
     );

@@ -1,18 +1,21 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../clients/supabaseClient";
-import { Database } from "../types/supabase";
+import { SessionInsert, SessionRow } from "../types/DbModels";
 
-type SessionInsert = Database["public"]["Tables"]["Session"]["Insert"];
-
-const addSession = async (session: SessionInsert): Promise<void> => {
-  const { error } = await supabase.from("Session").insert(session);
+const addSession = async (session: SessionInsert): Promise<SessionRow> => {
+  const { data, error } = await supabase
+    .from("Session")
+    .insert(session)
+    .select()
+    .single();
   if (error) throw new Error(error.message);
+  return data!;
 };
 
 export const useAddSession = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<SessionRow, Error, SessionInsert>({
     mutationFn: addSession,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["Session"] });

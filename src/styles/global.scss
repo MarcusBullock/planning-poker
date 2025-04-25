@@ -56,3 +56,39 @@ button {
     font-weight: normal;
     font-style: normal;
 }
+
+.Toastify__toast--success {
+    border: 3px solid #7d0200 !important;
+    border-radius: 50px !important;
+    background: #e7e4e4 !important;
+    font-family: 'Rye', serif;
+    color: rgb(55, 44, 44);
+    width: fit-content;
+}
+.Toastify__toast--success::before {
+    position: relative;
+    z-index: 100000;
+    left: 12px;
+    top: 6px;
+}
+.Toastify__toast--success::after {
+    position: absolute;
+    font-size: 18px;
+    font-weight: 700;
+    left: 265px;
+    padding-top: 14px !important;
+}
+.Toastify__toast-body {
+    font-size: 16px;
+    padding-left: 20px;
+    line-height: 20px;
+    padding: 0px;
+    padding-top: 25px;
+    width: 100%;
+    font-weight: 400;
+    margin-left: 25px !important;
+    font-family: 'Rye', serif;
+}
+.Toastify__toast > button > svg {
+    display: none;
+}
