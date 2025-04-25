@@ -1,32 +1,60 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { motion } from 'framer-motion';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCopy } from '@fortawesome/free-solid-svg-icons';
 import CreateUser from './CreateUser';
+import Info from './Info';
+import Players from './Players';
 import SessionManagerHub from '../../hubs/SessionManagerHub';
 import { useGetUserByGameCode } from '../../hooks/useGetUserBySessionCode';
 import { useGetSessionPlayers } from '../../hooks/useGetSessionPlayers';
 import { useCurrentUser } from '../../hooks/useCurrentUser';
+import { useGetSession } from '../../hooks/useGetSession';
+import { useUpdateSession } from '../../hooks/useUpdateSession';
 import 'react-toastify/dist/ReactToastify.css';
 import styles from './SessionPage.module.scss';
 
 function SessionPage() {
     const { code } = useParams<{ code: string }>();
+    const { data: session } = useGetSession(code!);
     const { data: sessionOwner } = useGetUserByGameCode(code!);
     const { data: players, refetch: refetchPlayers } = useGetSessionPlayers(code!);
     const { userId, setUserId } = useCurrentUser();
 
+    const queryClient = useQueryClient();
+    const { mutate: updateSession } = useUpdateSession({
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['GetSession', code] });
+        },
+        onError: (err) => {
+            console.error('Failed to update session:', err.message);
+        },
+    });
+
+    const notEnoughPlayers = !!players && players.length == 1;
+
+    const handleGame = (start: boolean) => {
+        if (notEnoughPlayers) {
+            toast.warn('You need at least 2 players to start a game', {
+                position: 'top-right',
+                autoClose: 1000,
+                hideProgressBar: true,
+                closeOnClick: true,
+            });
+        }
+
+        updateSession({
+            code: code!,
+            status: start ? 'active' : 'inactive',
+        });
+    };
+
     useEffect(() => {
         const initializeSignalR = async () => {
-            console.log('Initializing SignalR...');
             await SessionManagerHub.startConnection();
-            console.log('SignalR connection state after start:', SessionManagerHub.connectionState);
 
             if (SessionManagerHub.connectionState === 'Connected') {
                 await SessionManagerHub.joinSession(code!);
-                console.log(`Joined SignalR group for session: ${code}`);
 
                 SessionManagerHub.onPlayerJoined((sessionCode) => {
                     console.log('Player joined session:', sessionCode);
@@ -35,7 +63,7 @@ function SessionPage() {
                     }
                 });
             } else {
-                console.error('SignalR connection is not in the "Connected" state.');
+                console.error('SignalR not connected');
             }
         };
 
@@ -54,65 +82,22 @@ function SessionPage() {
     }, [code, userId, setUserId]);
 
     if (!userId) {
-        return <CreateUser sessionCode={code!} ownerName={sessionOwner?.name || 'Random person'} />;
+        return <CreateUser sessionCode={code!} ownerName={sessionOwner?.name} />;
     }
-
-    const handleCopy = () => {
-        navigator.clipboard.writeText(code!);
-        toast.success('Copied to clipboard!', {
-            position: 'top-right',
-            autoClose: 1000,
-            hideProgressBar: true,
-            closeOnClick: true,
-        });
-    };
 
     const currentUser = players?.find((player) => player.id === parseInt(userId));
 
     return (
         <div className={styles.sessionPage}>
-            <div className={styles.topRow}>
-                <motion.h1
-                    initial={{ x: -2500 }}
-                    animate={{ x: 0 }}
-                    transition={{ duration: 1, ease: 'easeOut' }}
-                >
-                    WELCOME, <span>{currentUser?.name}</span>!
-                </motion.h1>
-                <div className={styles.overviewCol}>
-                    <motion.div
-                        className={styles.owner}
-                        initial={{ x: 2500 }}
-                        animate={{ x: 0 }}
-                        transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
-                    >
-                        <h2>
-                            <span>OWNER: </span>
-                            <span className={styles.name}>{sessionOwner?.name}</span>
-                        </h2>
-                    </motion.div>
-                    <motion.div
-                        className={styles.btnRow}
-                        initial={{ x: 2500 }}
-                        animate={{ x: 0 }}
-                        transition={{ duration: 1, ease: 'easeOut', delay: 0.8 }}
-                    >
-                        <div className={styles.owner}>
-                            <h2>
-                                <span>CODE: </span>
-                                <span className={styles.name}>{code}</span>
-                            </h2>
-                        </div>
-                        <button type="button" onClick={handleCopy}>
-                            <FontAwesomeIcon icon={faCopy} size="xl" color="#7d0200" />
-                        </button>
-                    </motion.div>
-                </div>
-            </div>
-            <div>
-                <h3>Players</h3>
-                <ul>{players?.map((player) => <li key={player.id}>{player.name}</li>)}</ul>
-            </div>
+            <Info
+                gameStatus={session?.status}
+                ownerName={sessionOwner?.name}
+                currentUserName={currentUser?.name}
+                code={code!}
+                notEnoughPlayers={notEnoughPlayers}
+                handleGame={handleGame}
+            />
+            <Players players={players} />
         </div>
     );
 }

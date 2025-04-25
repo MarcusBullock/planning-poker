@@ -11,7 +11,7 @@ import SessionManagerHub from '../../hubs/SessionManagerHub';
 
 type CreateUserProps = {
     sessionCode: string;
-    ownerName: string;
+    ownerName?: string;
 };
 
 function CreateUser({ sessionCode, ownerName }: CreateUserProps) {

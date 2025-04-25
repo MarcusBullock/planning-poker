@@ -1,0 +1,33 @@
+.players {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    border: 3px solid rgb(39, 38, 38);
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+    border-radius: 50px;
+    padding: 30px 10px;
+    width: 300px;
+    min-height: 400px;
+    align-items: center;
+    background-color: #dddecd;
+
+    h2 {
+        text-align: center;
+        margin: 0 0 20px 0;
+        font-family: 'Rye', serif;
+        font-weight: 500;
+        font-size: 28px;
+        border-bottom: 2px solid black;
+        width: 150px;
+    }
+
+    ol {
+        display: flex;
+        flex-direction: column;
+        row-gap: 20px;
+        li {
+            font-family: 'CardCharacters', sans-serif;
+            font-size: 19px;
+        }
+    }
+}

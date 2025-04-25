@@ -43,6 +43,7 @@ function StartForm() {
                             ownerUserId: newUser.id,
                             created: new Date().toISOString(),
                             code,
+                            status: 'inactive',
                         },
                         {
                             onSuccess: () => {

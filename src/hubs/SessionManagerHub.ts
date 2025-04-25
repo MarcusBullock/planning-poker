@@ -5,20 +5,19 @@ class SessionManagerHub {
 
     constructor() {
         this.connection = new HubConnectionBuilder()
-            .withUrl('https://localhost:7204/realtime') // Replace with your SignalR hub URL
+            .withUrl('https://localhost:7204/realtime')
             .withAutomaticReconnect()
             .build();
     }
 
     get connectionState(): string {
-        return this.connection.state; // Expose the connection state
+        return this.connection.state;
     }
 
     async startConnection(): Promise<void> {
         try {
             if (this.connection.state === 'Disconnected') {
                 await this.connection.start();
-                console.log('Connected to SignalR hub');
             }
         } catch (err) {
             console.error('Error connecting to SignalR hub:', err);
@@ -29,7 +28,6 @@ class SessionManagerHub {
         try {
             if (this.connection.state === 'Connected') {
                 await this.connection.invoke('JoinSession', sessionCode);
-                console.log(`Joined session: ${sessionCode}`);
             } else {
                 console.error('Cannot join session: Connection is not in the "Connected" state.');
             }
@@ -48,7 +46,6 @@ class SessionManagerHub {
         try {
             if (this.connection.state === 'Connected') {
                 await this.connection.invoke('PlayerJoined', sessionCode);
-                console.log(`Notified hub about player joining session: ${sessionCode}`);
             } else {
                 console.error('Cannot notify hub: Connection is not in the "Connected" state.');
             }
@@ -59,7 +56,6 @@ class SessionManagerHub {
 
     onPlayerJoined(callback: (sessionCode: string) => void): void {
         this.connection.on('playerJoined', callback);
-        console.log('Registered playerJoined event listener');
     }
 
     onVoteCast(callback: (sessionCode: string) => void): void {

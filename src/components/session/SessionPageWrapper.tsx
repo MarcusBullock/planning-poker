@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { UserProvider } from '../../hooks/useCurrentUser';
+import { UserProvider } from '../../providers/UserProvider';
 import SessionPage from './SessionPage';
 
 function SessionPageWrapper() {

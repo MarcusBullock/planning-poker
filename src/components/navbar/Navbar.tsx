@@ -21,22 +21,17 @@ const Navbar = () => {
 
     return (
         <nav className={styles.navbar}>
-            <span className={styles.margin}></span>
             <div className={styles.container}>
-                <ul className={styles.navLinks}>
-                    <li>
-                        <Link to="/" className={styles.logo}>
-                            <img
-                                src={theme === 'light' ? lightLogo : darkLogo}
-                                alt="logo"
-                                className={styles.brand}
-                            />
-                        </Link>
-                    </li>
-                </ul>
-            </div>
-            <div className={styles.switch}>
-                <ThemeSwitch />
+                <Link to="/" className={styles.logo}>
+                    <img
+                        src={theme === 'light' ? lightLogo : darkLogo}
+                        alt="logo"
+                        className={styles.brand}
+                    />
+                </Link>
+                <div className={styles.switch}>
+                    <ThemeSwitch />
+                </div>
             </div>
         </nav>
     );
