@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { UserVote } from '../../types/UserVote';
 import { CardSuit } from '../../types/CardSuit';
@@ -12,19 +13,31 @@ type VoteProps = {
 
 function Vote({ vote, showVote, highlightTrigger }: VoteProps) {
     const isRedSuit = vote.suit === CardSuit.Hearts || vote.suit === CardSuit.Diamonds;
+    const [localHighlight, setLocalHighlight] = useState(false);
+
+    useEffect(() => {
+        if (highlightTrigger) {
+            setLocalHighlight(true); // Trigger the highlight
+            const timer = setTimeout(() => {
+                setLocalHighlight(false); // Reset the highlight after 300ms
+            }, 300);
+
+            return () => clearTimeout(timer); // Cleanup the timer on unmount or re-trigger
+        }
+    }, [highlightTrigger]);
+
     return (
         <div className={classNames(styles.wrapper, showVote ? styles.visible : styles.concealed)}>
             <AnimatePresence>
                 <motion.div
                     className={styles.vote}
+                    layout
                     animate={{
-                        backgroundColor: highlightTrigger ? '#ffeb3b' : '#fff', // dONT DO THIS, USE SIGNALR TO NOTIFY WHEN A PLAYER UPDATES A VOTE
+                        backgroundColor: localHighlight ? '#ffeb3b' : showVote ? '#fff' : '#2f2b2b',
                     }}
                     transition={{
                         duration: 0.3,
-                        repeat: 1,
                         ease: 'easeInOut',
-                        repeatType: 'reverse',
                     }}
                 >
                     {showVote ? (

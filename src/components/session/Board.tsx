@@ -25,8 +25,11 @@ function Board({ gameStatus, votes, highlightedPlayerId }: BoardProps) {
                 >
                     {votes
                         ?.sort((a, b) => a.userName.localeCompare(b.userName))
-                        .map(
-                            (vote) =>
+                        .map((vote) => {
+                            console.log(
+                                `highlightedPlayerId === vote.userId: ${highlightedPlayerId === vote.userId}`,
+                            );
+                            return (
                                 vote.vote && (
                                     <Vote
                                         key={vote.userId}
@@ -34,8 +37,9 @@ function Board({ gameStatus, votes, highlightedPlayerId }: BoardProps) {
                                         showVote={gameStatus === 'voted'}
                                         highlightTrigger={highlightedPlayerId === vote.userId}
                                     />
-                                ),
-                        )}
+                                )
+                            );
+                        })}
                 </motion.div>
             )}
         </AnimatePresence>

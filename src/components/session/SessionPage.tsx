@@ -29,10 +29,10 @@ function SessionPage() {
         }
     }, [isError, navigate]);
 
+    const [highlightedPlayerId, setHighlightedPlayerId] = useState<number | undefined>(undefined);
     const { data: sessionOwner } = useGetSessionOwner(code!);
     const { data: players, refetch: refetchPlayers } = useGetSessionPlayers(code!);
     const { data: votes, refetch: refetchVotes } = useGetVotes(code!);
-    const [highlightedPlayerId, setHighlightedPlayerId] = useState<number>();
     const { userId, setUserId } = useCurrentUser();
 
     const queryClient = useQueryClient();
@@ -120,6 +120,7 @@ function SessionPage() {
                     await SessionManagerHub.startConnection();
                 }
                 await SessionManagerHub.notifyVoteCast(code!, currentUser?.id || 0);
+                await SessionManagerHub.notifyPlayerHighlight(code!, currentUser?.id || 0);
             } catch (error) {
                 console.error('Failed to notify SignalR wrt updated status:', error);
             }
@@ -127,6 +128,16 @@ function SessionPage() {
             setHighlightedPlayerId(currentUser!.id);
         }
     };
+
+    useEffect(() => {
+        if (highlightedPlayerId !== null) {
+            const timer = setTimeout(() => {
+                setHighlightedPlayerId(undefined);
+            }, 1000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [highlightedPlayerId]);
 
     const handleShowVotes = () => {
         if (session?.status === 'active' && players) {
@@ -161,12 +172,12 @@ function SessionPage() {
 
     const refreshState = useCallback(() => {
         queryClient.invalidateQueries({ queryKey: ['GetSession', code] });
-        queryClient.invalidateQueries({ queryKey: ['GetPlayers', code] });
-        queryClient.invalidateQueries({ queryKey: ['GetVotes', code] });
+        queryClient.invalidateQueries({ queryKey: ['UsersBySessionCode', code] });
+        queryClient.invalidateQueries({ queryKey: ['GetUserVotes', code] });
 
         queryClient.refetchQueries({ queryKey: ['GetSession', code] });
-        queryClient.refetchQueries({ queryKey: ['GetPlayers', code] });
-        queryClient.refetchQueries({ queryKey: ['GetVotes', code] });
+        queryClient.refetchQueries({ queryKey: ['UsersBySessionCode', code] });
+        queryClient.refetchQueries({ queryKey: ['GetUserVotes', code] });
         refetchPlayers();
         refetchVotes();
         refetchSession();
@@ -196,8 +207,13 @@ function SessionPage() {
                     refreshState();
                 });
 
+                SessionManagerHub.onPlayerHighlight((sessionCode: string, userId: number) => {
+                    console.log('PLAYER HIGHLIGHT EVENT RECEIVED -------------------->');
+                    refreshState();
+                    setHighlightedPlayerId(userId);
+                });
+
                 SessionManagerHub.onSessionActive(() => {
-                    console.log('Session active event received');
                     refreshState();
                 });
             } else {
@@ -216,6 +232,7 @@ function SessionPage() {
         return <CreateUser sessionCode={code!} ownerName={sessionOwner?.name} />;
     }
 
+    console.log(`In the session page: HIGHLIGHTEDPLAYER CHANGED: ${highlightedPlayerId}`);
     return (
         <div className={styles.sessionPage}>
             <Info
