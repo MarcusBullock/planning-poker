@@ -1,24 +1,38 @@
-import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import CreateUser from './CreateUser';
 import Info from './Info';
-import Players from './Players';
+import GamePanel from './GamePanel';
+import VoteControls from './VoteControls';
+import { CardSuit } from '../../types/CardSuit';
 import SessionManagerHub from '../../hubs/SessionManagerHub';
-import { useGetUserByGameCode } from '../../hooks/useGetUserBySessionCode';
+import { useGetSessionOwner } from '../../hooks/useGetSessionOwner';
 import { useGetSessionPlayers } from '../../hooks/useGetSessionPlayers';
 import { useCurrentUser } from '../../hooks/useCurrentUser';
 import { useGetSession } from '../../hooks/useGetSession';
 import { useUpdateSession } from '../../hooks/useUpdateSession';
+import { useUpdateUser } from '../../hooks/useUpdateUser';
+import { useGetVotes } from '../../hooks/useGetVotes';
 import 'react-toastify/dist/ReactToastify.css';
 import styles from './SessionPage.module.scss';
 
 function SessionPage() {
     const { code } = useParams<{ code: string }>();
-    const { data: session } = useGetSession(code!);
-    const { data: sessionOwner } = useGetUserByGameCode(code!);
+    const navigate = useNavigate();
+    const { data: session, refetch: refetchSession, isError } = useGetSession(code!);
+
+    useEffect(() => {
+        if (isError) {
+            navigate('/');
+        }
+    }, [isError, navigate]);
+
+    const { data: sessionOwner } = useGetSessionOwner(code!);
     const { data: players, refetch: refetchPlayers } = useGetSessionPlayers(code!);
+    const { data: votes, refetch: refetchVotes } = useGetVotes(code!);
+    const [highlightedPlayerId, setHighlightedPlayerId] = useState<number>();
     const { userId, setUserId } = useCurrentUser();
 
     const queryClient = useQueryClient();
@@ -31,9 +45,26 @@ function SessionPage() {
         },
     });
 
+    const { mutate: updateUser } = useUpdateUser({
+        onSuccess: async () => {
+            try {
+                if (SessionManagerHub.connectionState !== 'Connected') {
+                    await SessionManagerHub.startConnection();
+                }
+                await SessionManagerHub.notifyVoteCast(code!, currentUser?.id || 0);
+            } catch (error) {
+                console.error('Failed to notify SignalR wrt vote:', error);
+            }
+        },
+        onError: (err) => {
+            console.error('Failed to update user:', err.message);
+        },
+    });
+
+    const currentUser = players?.find((player) => player.id === parseInt(userId!));
     const notEnoughPlayers = !!players && players.length == 1;
 
-    const handleGame = (start: boolean) => {
+    const handleGameStartOrStop = async (start: boolean) => {
         if (notEnoughPlayers) {
             toast.warn('You need at least 2 players to start a game', {
                 position: 'top-right',
@@ -41,13 +72,112 @@ function SessionPage() {
                 hideProgressBar: true,
                 closeOnClick: true,
             });
+            return;
         }
 
-        updateSession({
-            code: code!,
-            status: start ? 'active' : 'inactive',
-        });
+        console.log('Current session status:', session?.status);
+        console.log('Updating session status to:', start ? 'active' : 'inactive');
+
+        if (session?.status === (start ? 'active' : 'inactive')) {
+            console.warn('Session status is already', session?.status);
+            return;
+        }
+
+        try {
+            updateSession({
+                code: code!,
+                status: start ? 'active' : 'inactive',
+            });
+
+            refetchSession(); // Ensure session state is updated
+
+            if (SessionManagerHub.connectionState !== 'Connected') {
+                await SessionManagerHub.startConnection();
+            }
+
+            await SessionManagerHub.notifySessionActive(code!);
+            console.log(
+                'Notified SignalR of session status change:',
+                start ? 'active' : 'inactive',
+            );
+        } catch (error) {
+            console.error('Failed to update session or notify SignalR:', error);
+        }
     };
+
+    const handleVote = async (vote: number) => {
+        if (session?.status === 'active') {
+            const suits = Object.values(CardSuit);
+            const randomIndex = Math.floor(Math.random() * suits.length);
+            updateUser({
+                id: currentUser?.id || 0,
+                vote,
+                suit: suits[randomIndex],
+            });
+
+            try {
+                if (SessionManagerHub.connectionState !== 'Connected') {
+                    await SessionManagerHub.startConnection();
+                }
+                await SessionManagerHub.notifyVoteCast(code!, currentUser?.id || 0);
+            } catch (error) {
+                console.error('Failed to notify SignalR wrt updated status:', error);
+            }
+
+            setHighlightedPlayerId(currentUser!.id);
+        }
+    };
+
+    const handleShowVotes = () => {
+        if (session?.status === 'active' && players) {
+            const hasVotes = players.filter((player) => player.vote !== null).length >= 2;
+            if (hasVotes) {
+                updateSession({
+                    code: code!,
+                    status: 'voted',
+                });
+            } else {
+                toast.warn('Need at least 2 votes', {
+                    position: 'top-right',
+                    autoClose: 1000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                });
+            }
+        }
+    };
+
+    const handleResetVotes = () => {
+        if (session?.status === 'voted' || session?.status === 'active') {
+            updateSession({
+                code: code!,
+                status: 'active',
+            });
+            players?.forEach((player) => {
+                if (player.vote) updateUser({ id: player.id, vote: null });
+            });
+        }
+    };
+
+    const refreshState = useCallback(() => {
+        queryClient.invalidateQueries({ queryKey: ['GetSession', code] });
+        queryClient.invalidateQueries({ queryKey: ['GetPlayers', code] });
+        queryClient.invalidateQueries({ queryKey: ['GetVotes', code] });
+
+        queryClient.refetchQueries({ queryKey: ['GetSession', code] });
+        queryClient.refetchQueries({ queryKey: ['GetPlayers', code] });
+        queryClient.refetchQueries({ queryKey: ['GetVotes', code] });
+        refetchPlayers();
+        refetchVotes();
+        refetchSession();
+    }, [queryClient, code, refetchPlayers, refetchSession, refetchVotes]);
+
+    useEffect(() => {
+        const storedUserId = localStorage.getItem(code!);
+        if (storedUserId !== userId) {
+            setUserId(storedUserId);
+        }
+    }, [code, userId, setUserId]);
 
     useEffect(() => {
         const initializeSignalR = async () => {
@@ -56,11 +186,19 @@ function SessionPage() {
             if (SessionManagerHub.connectionState === 'Connected') {
                 await SessionManagerHub.joinSession(code!);
 
-                SessionManagerHub.onPlayerJoined((sessionCode) => {
-                    console.log('Player joined session:', sessionCode);
+                SessionManagerHub.onPlayerJoined((sessionCode: string) => {
                     if (sessionCode === code) {
-                        refetchPlayers();
+                        refreshState();
                     }
+                });
+
+                SessionManagerHub.onVoteCast(() => {
+                    refreshState();
+                });
+
+                SessionManagerHub.onSessionActive(() => {
+                    console.log('Session active event received');
+                    refreshState();
                 });
             } else {
                 console.error('SignalR not connected');
@@ -72,20 +210,11 @@ function SessionPage() {
         return () => {
             SessionManagerHub.stopConnection();
         };
-    }, [code, refetchPlayers]);
-
-    useEffect(() => {
-        const storedUserId = localStorage.getItem(code!);
-        if (storedUserId !== userId) {
-            setUserId(storedUserId);
-        }
-    }, [code, userId, setUserId]);
+    }, [code, refreshState]);
 
     if (!userId) {
         return <CreateUser sessionCode={code!} ownerName={sessionOwner?.name} />;
     }
-
-    const currentUser = players?.find((player) => player.id === parseInt(userId));
 
     return (
         <div className={styles.sessionPage}>
@@ -95,9 +224,17 @@ function SessionPage() {
                 currentUserName={currentUser?.name}
                 code={code!}
                 notEnoughPlayers={notEnoughPlayers}
-                handleGame={handleGame}
+                handleGame={handleGameStartOrStop}
+                handleShowVotes={handleShowVotes}
+                handleResetVotes={handleResetVotes}
             />
-            <Players players={players} />
+            <GamePanel
+                players={players}
+                gameStatus={session?.status}
+                votes={votes || []}
+                highlightedPlayerId={highlightedPlayerId}
+            />
+            {session?.status === 'active' && <VoteControls onVote={handleVote} />}
         </div>
     );
 }

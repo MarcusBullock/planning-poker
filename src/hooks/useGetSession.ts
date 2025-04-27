@@ -3,7 +3,6 @@ import { supabase } from '../clients/supabaseClient';
 import { SessionRow } from '../types/DbModels';
 
 const getSession = async (sessionCode: string): Promise<SessionRow> => {
-    // Step 1: Fetch the session by game code
     const { data: session, error: sessionError } = await supabase
         .from('Session')
         .select('*')

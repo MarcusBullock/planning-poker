@@ -3,7 +3,7 @@ import styles from './PlayingCard.module.scss';
 import { CardSuit } from '../../types/CardSuit';
 
 interface CardButtonProps {
-    children: React.ReactNode;
+    children?: React.ReactNode;
     suit: CardSuit;
     rank: string;
     className?: string;

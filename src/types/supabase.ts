@@ -33,68 +33,21 @@ export type Database = {
                     code: string;
                     created: string;
                     id: number;
-                    ownerUserId: number;
                     status: string;
                 };
                 Insert: {
                     code: string;
                     created?: string;
                     id?: number;
-                    ownerUserId: number;
                     status: string;
                 };
                 Update: {
                     code?: string;
                     created?: string;
                     id?: number;
-                    ownerUserId?: number;
                     status?: string;
                 };
-                Relationships: [
-                    {
-                        foreignKeyName: 'Session_ownerUserId_fkey';
-                        columns: ['ownerUserId'];
-                        isOneToOne: false;
-                        referencedRelation: 'User';
-                        referencedColumns: ['id'];
-                    },
-                ];
-            };
-            SessionUser: {
-                Row: {
-                    created: string;
-                    id: number;
-                    sessionCode: string;
-                    userId: number;
-                };
-                Insert: {
-                    created?: string;
-                    id?: number;
-                    sessionCode: string;
-                    userId: number;
-                };
-                Update: {
-                    created?: string;
-                    id?: number;
-                    sessionCode?: string;
-                    userId?: number;
-                };
-                Relationships: [
-                    {
-                        foreignKeyName: 'SessionUser_sessionCode_fkey';
-                        columns: ['sessionCode'];
-                        isOneToOne: false;
-                        referencedRelation: 'Session';
-                        referencedColumns: ['code'];
-                    },
-                    {
-                        foreignKeyName: 'SessionUser_userId_fkey';
-                        columns: ['userId'];
-                        isOneToOne: false;
-                        referencedRelation: 'User';
-                        referencedColumns: ['id'];
-                    },
-                ];
+                Relationships: [];
             };
             User: {
                 Row: {
@@ -102,20 +55,37 @@ export type Database = {
                     id: number;
                     name: string;
                     role: string;
+                    sessionCode: string;
+                    suit: string | null;
+                    vote: number | null;
                 };
                 Insert: {
                     created?: string;
                     id?: number;
                     name: string;
                     role: string;
+                    sessionCode: string;
+                    suit?: string | null;
+                    vote?: number | null;
                 };
                 Update: {
                     created?: string;
                     id?: number;
                     name?: string;
                     role?: string;
+                    sessionCode?: string;
+                    suit?: string | null;
+                    vote?: number | null;
                 };
-                Relationships: [];
+                Relationships: [
+                    {
+                        foreignKeyName: 'User_sessionCode_fkey';
+                        columns: ['sessionCode'];
+                        isOneToOne: false;
+                        referencedRelation: 'Session';
+                        referencedColumns: ['code'];
+                    },
+                ];
             };
         };
         Views: {

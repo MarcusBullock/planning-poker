@@ -1,0 +1,54 @@
+.players {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: row;
+    border: 3px solid rgb(39, 38, 38);
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+    width: 300px;
+    height: 600px;
+    background-color: #dddecd;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+
+    .playerList {
+        display: flex;
+        flex-direction: column;
+        width: 300px;
+        min-width: 300px;
+        max-width: 300px;
+        height: 600px;
+        z-index: 2;
+        align-items: center;
+        padding-top: 20px;
+
+        h2 {
+            text-align: center;
+            margin: 0 0 20px 0;
+            font-family: 'Rye', serif;
+            font-weight: 500;
+            font-size: 28px;
+            border-bottom: 2px solid black;
+            width: 150px;
+        }
+
+        ol {
+            display: flex;
+            flex-direction: column;
+            row-gap: 20px;
+
+            li {
+                font-family: 'CardCharacters', sans-serif;
+                font-size: 19px;
+            }
+        }
+    }
+}
+
+.active {
+    width: 100%;
+    border-radius: 50px;
+}
+
+.inactive {
+    border-radius: 50px;
+}

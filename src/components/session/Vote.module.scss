@@ -1,0 +1,123 @@
+.vote {
+    height: 200px;
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 15px;
+
+    .rankAndSuit {
+        display: flex;
+        justify-content: start;
+        flex-direction: column;
+        height: 33%;
+        padding: 10px;
+
+        .rank {
+            font-family: 'CardCharacters', sans-serif;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .rankRight {
+            transform: rotate(180deg);
+            margin-bottom: 5px;
+            margin-right: 7px;
+        }
+
+        .suit {
+            font-size: 2rem;
+            line-height: 20px;
+        }
+
+        .suitLeft {
+            padding: 5px 0 0 5px;
+        }
+
+        .suitRight {
+            padding: 5px 0 0 5px;
+            transform: rotate(180deg);
+        }
+    }
+
+    .cardBody {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 33%;
+        font-family: 'Fascinate Inline', system-ui;
+        font-weight: 400;
+        font-style: normal;
+        font-size: 50px;
+        color: #343356;
+    }
+
+    .top {
+        align-items: start;
+    }
+
+    .bottom {
+        align-items: end;
+        justify-content: end;
+    }
+
+    .nameConcealed {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: auto;
+        color: #a43838;
+        font-family: 'CardCharacters', sans-serif;
+        font-size: 0.9rem;
+        overflow: hidden;
+        border-top: 2px solid #a43838;
+        border-bottom: 2px solid #a43838;
+        padding: 10px 0px;
+    }
+}
+
+.red {
+    color: #a43838;
+}
+
+.black {
+    color: #000000;
+}
+
+[data-theme='dark'] .playingCard {
+    background-color: #6c6b6b;
+}
+
+[data-theme='dark'] .cardBody {
+    color: #cd7575;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+    row-gap: 10px;
+    align-items: center;
+    border-radius: 15px;
+
+    .name {
+        text-align: center;
+        color: #a43838;
+        font-family: 'CardCharacters', sans-serif;
+        font-size: 0.9rem;
+        overflow: hidden;
+        border-top: 2px solid black;
+        border-bottom: 2px solid black;
+        padding: 10px 0px;
+    }
+}
+
+.concealed {
+    background-color: #2f2b2b;
+}
+
+.visible {
+    background-color: #fff;
+}

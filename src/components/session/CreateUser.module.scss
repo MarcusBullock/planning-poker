@@ -49,6 +49,10 @@
                 background-color: #a17b7a;
                 color: #fffcfc;
                 padding: 10px 20px;
+
+                &:disabled {
+                    cursor: not-allowed;
+                }
             }
         }
     }

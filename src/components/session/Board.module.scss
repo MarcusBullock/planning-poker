@@ -1,0 +1,14 @@
+.board {
+    background-color: #37923d;
+    width: 600px;
+    border-top-right-radius: 50px;
+    border-bottom-right-radius: 50px;
+    border-left: 5px solid rgb(6, 68, 12);
+    padding: 10px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    column-gap: 20px;
+    row-gap: 5px;
+}

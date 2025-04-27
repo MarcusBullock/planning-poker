@@ -1,13 +1,12 @@
-import { useNavigate } from 'react-router-dom';
-import styles from './CreateUser.module.scss';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useAddUser } from '../../hooks/useAddUser';
 import ButtonLoading from '../shared/ButtonLoading';
-import { UserRow } from '../../types/DbModels';
-import { useAddSessionUser } from '../../hooks/useAddSessionUser';
-import { useCurrentUser } from '../../hooks/useCurrentUser';
 import SessionManagerHub from '../../hubs/SessionManagerHub';
+import { useCurrentUser } from '../../hooks/useCurrentUser';
+import { useAddUser } from '../../hooks/useAddUser';
+import { UserRow } from '../../types/DbModels';
+import styles from './CreateUser.module.scss';
 
 type CreateUserProps = {
     sessionCode: string;
@@ -19,7 +18,18 @@ function CreateUser({ sessionCode, ownerName }: CreateUserProps) {
     const [username, setUsername] = useState('');
     const { setUserId } = useCurrentUser();
     const { mutate: addUser, isPending: isUserPending } = useAddUser();
-    const { mutate: addSessionUser, isPending: isSessionUserPending } = useAddSessionUser();
+
+    const createUser = async () => {
+        try {
+            if (SessionManagerHub.connectionState !== 'Connected') {
+                await SessionManagerHub.startConnection();
+            }
+            await SessionManagerHub.joinSession(sessionCode);
+            await SessionManagerHub.notifyPlayerJoined(sessionCode);
+        } catch (error) {
+            console.error('Failed to notify SignalR hub about new player:', error);
+        }
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -35,41 +45,22 @@ function CreateUser({ sessionCode, ownerName }: CreateUserProps) {
         }
 
         addUser(
-            { name: username, created: new Date().toISOString(), role: 'player' },
             {
-                onSuccess: (newUser: UserRow) => {
-                    addSessionUser(
-                        {
-                            created: new Date().toISOString(),
-                            userId: newUser.id,
-                            sessionCode,
-                        },
-                        {
-                            onSuccess: async () => {
-                                localStorage.setItem(sessionCode, newUser.id.toString());
-                                setUserId(newUser.id.toString());
-                                try {
-                                    if (SessionManagerHub.connectionState !== 'Connected') {
-                                        await SessionManagerHub.startConnection();
-                                    }
-                                    await SessionManagerHub.joinSession(sessionCode);
-                                    await SessionManagerHub.notifyPlayerJoined(sessionCode);
-                                } catch (error) {
-                                    console.error(
-                                        'Failed to notify SignalR hub about new player:',
-                                        error,
-                                    );
-                                }
+                name: username,
+                created: new Date().toISOString(),
+                role: 'player',
+                sessionCode,
+            },
+            {
+                onSuccess: async (newUser: UserRow) => {
+                    localStorage.setItem(sessionCode, newUser.id.toString());
 
-                                setTimeout(() => {
-                                    navigate(`/session/${sessionCode}`);
-                                }, 0);
-                            },
-                            onError: (error) => {
-                                console.error('Failed to add session user:', error);
-                            },
-                        },
-                    );
+                    setUserId(newUser.id.toString());
+                    await createUser();
+
+                    setTimeout(() => {
+                        navigate(`/session/${sessionCode}`);
+                    }, 0);
                 },
                 onError: (error) => {
                     console.error('Failed to add user:', error);
@@ -87,11 +78,8 @@ function CreateUser({ sessionCode, ownerName }: CreateUserProps) {
                 <p>Enter your name to join the session.</p>
                 <form onSubmit={handleSubmit}>
                     <input onChange={(e) => setUsername(e.target.value)} placeholder="YOUR NAME" />
-                    <button
-                        type="submit"
-                        disabled={!username || isSessionUserPending || isUserPending}
-                    >
-                        {isSessionUserPending || isUserPending ? <ButtonLoading /> : 'ENTER'}
+                    <button type="submit" disabled={!username || isUserPending}>
+                        {isUserPending ? <ButtonLoading /> : 'ENTER'}
                     </button>
                 </form>
             </div>

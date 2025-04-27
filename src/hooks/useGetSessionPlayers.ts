@@ -3,22 +3,13 @@ import { supabase } from '../clients/supabaseClient';
 import { UserRow } from '../types/DbModels';
 
 const getSessionPlayers = async (sessionCode: string): Promise<UserRow[]> => {
-    const { data: sessionUsers, error: sessionError } = await supabase
-        .from('SessionUser')
-        .select('userId')
-        .eq('sessionCode', sessionCode);
-
-    if (sessionError) throw new Error(`Session Error: ${sessionError.message}`);
-    if (!sessionUsers || sessionUsers.length === 0) throw new Error('Session not found');
-
-    const userIds = sessionUsers.map((sessionUser) => sessionUser.userId);
-    const { data: users, error: userError } = await supabase
+    const { data: users, error } = await supabase
         .from('User')
         .select('*')
-        .in('id', userIds);
+        .eq('sessionCode', sessionCode);
 
-    if (userError) throw new Error(`User Error: ${userError.message}`);
-    if (!users || users.length === 0) throw new Error('No user details found');
+    if (error) throw new Error(`User Error: ${error.message}`);
+    if (!users || users.length === 0) throw new Error('User not found');
 
     return users;
 };

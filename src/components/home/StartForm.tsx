@@ -1,22 +1,20 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { nanoid } from 'nanoid';
 import { useAddUser } from '../../hooks/useAddUser';
 import { useAddSession } from '../../hooks/useAddSession';
-import PlayingCard from './PlayingCard';
+import { useCurrentUser } from '../../hooks/useCurrentUser';
 import { CardSuit } from '../../types/CardSuit';
 import { UserRow } from '../../types/DbModels';
+import PlayingCard from './PlayingCard';
 import ButtonLoading from '../shared/ButtonLoading';
-import { nanoid } from 'nanoid';
 import styles from './StartForm.module.scss';
-import { toast } from 'react-toastify';
-import { useAddSessionUser } from '../../hooks/useAddSessionUser';
-import { useCurrentUser } from '../../hooks/useCurrentUser';
 
 function StartForm() {
     const [username, setUsername] = useState('');
     const { mutate: addUser, isPending } = useAddUser();
     const { mutate: addSession, isPending: isSessionPending } = useAddSession();
-    const { mutate: addSessionUser, isPending: isSessionUserPending } = useAddSessionUser();
     const { setUserId } = useCurrentUser();
     const navigate = useNavigate();
 
@@ -33,49 +31,37 @@ function StartForm() {
             return;
         }
 
-        addUser(
-            { name: username, created: new Date().toISOString(), role: 'owner' },
+        const code = nanoid(8);
+
+        addSession(
             {
-                onSuccess: (newUser: UserRow) => {
-                    const code = nanoid(8);
-                    addSession(
+                created: new Date().toISOString(),
+                code,
+                status: 'inactive',
+            },
+            {
+                onSuccess: () => {
+                    addUser(
                         {
-                            ownerUserId: newUser.id,
+                            name: username,
                             created: new Date().toISOString(),
-                            code,
-                            status: 'inactive',
+                            role: 'owner',
+                            sessionCode: code,
                         },
                         {
-                            onSuccess: () => {
-                                addSessionUser(
-                                    {
-                                        created: new Date().toISOString(),
-                                        userId: newUser.id,
-                                        sessionCode: code,
-                                    },
-                                    {
-                                        onSuccess: () => {
-                                            localStorage.setItem(code, newUser.id.toString());
-                                            setUserId(newUser.id.toString());
-                                            navigate(`/session/${code}`);
-                                        },
-                                        onError: (sessionUserError) => {
-                                            console.error(
-                                                'Failed to create session user:',
-                                                sessionUserError,
-                                            );
-                                        },
-                                    },
-                                );
+                            onSuccess: (newUser: UserRow) => {
+                                localStorage.setItem(code, newUser.id.toString());
+                                setUserId(newUser.id.toString());
+                                navigate(`/session/${code}`);
                             },
-                            onError: (sessionError) => {
-                                console.error('Failed to create session:', sessionError);
+                            onError: (userError) => {
+                                console.error('Failed to create user:', userError);
                             },
                         },
                     );
                 },
-                onError: (userError) => {
-                    console.error('Failed to add user:', userError);
+                onError: (sessionError) => {
+                    console.error('Failed to add session:', sessionError);
                 },
             },
         );
@@ -92,17 +78,8 @@ function StartForm() {
                         onChange={(e) => setUsername(e.target.value)}
                         required
                     />
-                    <button
-                        type="submit"
-                        disabled={
-                            !username || isPending || isSessionPending || isSessionUserPending
-                        }
-                    >
-                        {isPending || isSessionPending || isSessionUserPending ? (
-                            <ButtonLoading />
-                        ) : (
-                            'START'
-                        )}
+                    <button type="submit" disabled={!username || isPending || isSessionPending}>
+                        {isPending || isSessionPending ? <ButtonLoading /> : 'START'}
                     </button>
                 </form>
             </PlayingCard>

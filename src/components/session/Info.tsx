@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { Tooltip } from 'react-tooltip';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -13,6 +13,8 @@ type InfoProps = {
     code: string;
     notEnoughPlayers: boolean;
     handleGame: (start: boolean) => void;
+    handleShowVotes: () => void;
+    handleResetVotes: () => void;
 };
 
 function Info({
@@ -22,6 +24,8 @@ function Info({
     notEnoughPlayers,
     handleGame,
     gameStatus,
+    handleShowVotes,
+    handleResetVotes,
 }: InfoProps) {
     const handleCopy = () => {
         navigator.clipboard.writeText(code!);
@@ -32,6 +36,7 @@ function Info({
             closeOnClick: true,
         });
     };
+
     return (
         <div className={styles.info}>
             <div className={styles.controls}>
@@ -50,24 +55,74 @@ function Info({
                     WELCOME, <span>{currentUserName}</span>!
                 </motion.h1>
 
-                <motion.button
-                    type="button"
-                    onClick={() => handleGame(gameStatus === 'inactive')}
-                    className={classNames(
-                        styles.btn,
-                        gameStatus === 'active' ? styles.red : styles.green,
-                    )}
-                    data-tooltip-id="start-game-tooltip"
-                    data-tooltip-content="Not enough players to start the game"
-                    whileHover={{ scale: 1.3 }}
-                    whileTap={{ scale: 0.5 }}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5 }}
+                <motion.div
+                    className={styles.controlBtns}
+                    initial={{ x: -2500 }}
+                    animate={{
+                        x: 0,
+                    }}
+                    transition={{
+                        duration: 1,
+                        ease: 'easeOut',
+                    }}
                 >
-                    {gameStatus === 'inactive' ? 'START GAME' : 'STOP GAME'}
-                </motion.button>
-                {notEnoughPlayers && <Tooltip id="start-game-tooltip" place="bottom" />}
+                    <motion.button
+                        className={classNames(
+                            styles.btn,
+                            gameStatus === 'active' || gameStatus === 'voted'
+                                ? styles.red
+                                : styles.green,
+                        )}
+                        type="button"
+                        disabled={notEnoughPlayers}
+                        onClick={() => handleGame(gameStatus === 'inactive')}
+                        data-tooltip-id="start-game-tooltip"
+                        data-tooltip-content="Not enough players to start the game"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.5 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        {gameStatus === 'inactive' ? 'START GAME' : 'STOP GAME'}
+                    </motion.button>
+                    {notEnoughPlayers && <Tooltip id="start-game-tooltip" place="bottom" />}
+                    <AnimatePresence>
+                        {gameStatus === 'active' && (
+                            <motion.button
+                                key="show"
+                                type="button"
+                                className={styles.showVotes}
+                                initial={{ opacity: 0, y: -20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                transition={{ duration: 0.5, ease: 'easeOut' }}
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.5 }}
+                                onClick={handleShowVotes}
+                            >
+                                SHOW VOTES
+                            </motion.button>
+                        )}
+                        {gameStatus === 'voted' ||
+                            (gameStatus === 'active' && (
+                                <motion.button
+                                    key="reset"
+                                    type="button"
+                                    className={styles.resetVotes}
+                                    initial={{ opacity: 0, y: -20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -20 }}
+                                    transition={{ duration: 0.5, ease: 'easeOut' }}
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.5 }}
+                                    onClick={handleResetVotes}
+                                >
+                                    RESET VOTES
+                                </motion.button>
+                            ))}
+                    </AnimatePresence>
+                </motion.div>
             </div>
             <div className={styles.overviewCol}>
                 <motion.div
@@ -87,7 +142,7 @@ function Info({
                     animate={{ x: 0 }}
                     transition={{ duration: 1, ease: 'easeOut', delay: 0.8 }}
                 >
-                    <div className={styles.owner}>
+                    <div className={classNames(styles.owner, styles.code)}>
                         <h2>
                             <span>CODE: </span>
                             <span className={styles.name}>{code}</span>
