@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { debounce } from 'lodash';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import CreateUser from './CreateUser';
@@ -17,6 +18,7 @@ import { useUpdateUser } from '../../hooks/useUpdateUser';
 import { useGetVotes } from '../../hooks/useGetVotes';
 import 'react-toastify/dist/ReactToastify.css';
 import styles from './SessionPage.module.scss';
+import { UserVote } from '../../types/UserVote';
 
 function SessionPage() {
     const { code } = useParams<{ code: string }>();
@@ -109,6 +111,26 @@ function SessionPage() {
         if (session?.status === 'active') {
             const suits = Object.values(CardSuit);
             const randomIndex = Math.floor(Math.random() * suits.length);
+
+            queryClient.setQueryData(['GetUserVotes', code], (oldVotes: UserVote[] = []) => {
+                const existingVote = oldVotes.find((v) => v.userId === currentUser?.id);
+
+                if (existingVote) {
+                    return oldVotes.map((v) =>
+                        v.userId === currentUser?.id ? { ...v, vote, suit: suits[randomIndex] } : v,
+                    );
+                }
+
+                return [
+                    ...oldVotes,
+                    {
+                        userId: currentUser?.id || 0,
+                        vote,
+                        suit: suits[randomIndex],
+                    },
+                ];
+            });
+
             updateUser({
                 id: currentUser?.id || 0,
                 vote,
@@ -128,14 +150,15 @@ function SessionPage() {
             setHighlightedPlayerId(currentUser!.id);
         }
     };
-
     useEffect(() => {
         if (highlightedPlayerId !== null) {
+            console.log(`Highlighting player: ${highlightedPlayerId}`);
             const timer = setTimeout(() => {
                 setHighlightedPlayerId(undefined);
+                console.log('Highlight reset after 1 second');
             }, 1000);
 
-            return () => clearTimeout(timer);
+            return () => clearTimeout(timer); // Cleanup timeout
         }
     }, [highlightedPlayerId]);
 
@@ -191,6 +214,8 @@ function SessionPage() {
     }, [code, userId, setUserId]);
 
     useEffect(() => {
+        const debouncedRefreshState = debounce(refreshState, 500);
+
         const initializeSignalR = async () => {
             await SessionManagerHub.startConnection();
 
@@ -204,10 +229,10 @@ function SessionPage() {
                 });
 
                 SessionManagerHub.onVoteCast(() => {
-                    refreshState();
+                    debouncedRefreshState();
                 });
 
-                SessionManagerHub.onPlayerHighlight((sessionCode: string, userId: number) => {
+                SessionManagerHub.onPlayerHighlight((_sessionCode: string, userId: number) => {
                     console.log('PLAYER HIGHLIGHT EVENT RECEIVED -------------------->');
                     refreshState();
                     setHighlightedPlayerId(userId);

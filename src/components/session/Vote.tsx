@@ -32,9 +32,13 @@ function Vote({ vote, showVote, highlightTrigger }: VoteProps) {
                 <motion.div
                     className={styles.vote}
                     layout
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{
+                        opacity: 1,
+                        y: 0,
                         backgroundColor: localHighlight ? '#ffeb3b' : showVote ? '#fff' : '#2f2b2b',
                     }}
+                    exit={{ opacity: 0, y: -20 }}
                     transition={{
                         duration: 0.3,
                         ease: 'easeInOut',

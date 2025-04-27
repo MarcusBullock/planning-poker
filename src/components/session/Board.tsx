@@ -24,7 +24,7 @@ function Board({ gameStatus, votes, highlightedPlayerId }: BoardProps) {
                     }}
                 >
                     {votes
-                        ?.sort((a, b) => a.userName.localeCompare(b.userName))
+                        ?.sort((a, b) => a.userName?.localeCompare(b.userName))
                         .map((vote) => {
                             console.log(
                                 `highlightedPlayerId === vote.userId: ${highlightedPlayerId === vote.userId}`,
