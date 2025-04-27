@@ -16,7 +16,7 @@ function Vote({ vote, showVote, highlightTrigger }: VoteProps) {
     const [localHighlight, setLocalHighlight] = useState(false);
 
     useEffect(() => {
-        if (highlightTrigger && !showVote) {
+        if (highlightTrigger) {
             setLocalHighlight(true);
             const timer = setTimeout(() => {
                 setLocalHighlight(false);

@@ -11,7 +11,7 @@ type BoardProps = {
 
 function Board({ gameStatus, votes, highlightedPlayerId }: BoardProps) {
     return (
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
             {(gameStatus === 'active' || gameStatus === 'voted') && (
                 <motion.div
                     className={styles.board}
@@ -23,7 +23,7 @@ function Board({ gameStatus, votes, highlightedPlayerId }: BoardProps) {
                         ease: 'easeInOut',
                     }}
                 >
-                    <AnimatePresence mode="wait">
+                    <AnimatePresence>
                         {votes
                             ?.sort((a, b) => a.userName?.localeCompare(b.userName))
                             .map(

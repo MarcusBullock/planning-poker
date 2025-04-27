@@ -143,6 +143,7 @@ function SessionPage() {
             setHighlightedPlayerId(currentUser!.id);
         }
     };
+
     useEffect(() => {
         if (highlightedPlayerId !== null) {
             const timer = setTimeout(() => {
@@ -153,7 +154,7 @@ function SessionPage() {
         }
     }, [highlightedPlayerId]);
 
-    const handleShowVotes = () => {
+    const handleShowVotes = async () => {
         if (session?.status === 'active' && players) {
             const hasVotes = players.filter((player) => player.vote !== null).length >= 2;
             if (hasVotes) {
@@ -168,6 +169,16 @@ function SessionPage() {
                     hideProgressBar: true,
                     closeOnClick: true,
                 });
+                return;
+            }
+
+            try {
+                if (SessionManagerHub.connectionState !== 'Connected') {
+                    await SessionManagerHub.startConnection();
+                }
+                await SessionManagerHub.notifyShowVotes(code!);
+            } catch (error) {
+                console.error('Failed to notify SignalR wrt updated status:', error);
             }
         }
     };
@@ -188,6 +199,28 @@ function SessionPage() {
                 await SessionManagerHub.startConnection();
             }
             await SessionManagerHub.notifyResetVotes(code!);
+        } catch (error) {
+            console.error('Failed to notify SignalR wrt reset votes', error);
+        }
+    };
+
+    const handleResetGame = async () => {
+        if (session?.status === 'voted' || session?.status === 'active') {
+            updateSession({
+                code: code!,
+                status: 'inactive',
+            });
+            players?.forEach((player) => {
+                if (player.vote) updateUser({ id: player.id, vote: null });
+            });
+        }
+
+        try {
+            if (SessionManagerHub.connectionState !== 'Connected') {
+                await SessionManagerHub.startConnection();
+            }
+            await SessionManagerHub.notifyResetVotes(code!);
+            await SessionManagerHub.notifySessionActive(code!);
         } catch (error) {
             console.error('Failed to notify SignalR wrt reset votes', error);
         }
@@ -243,7 +276,6 @@ function SessionPage() {
 
                 SessionManagerHub.onResetVotes(() => {
                     refreshState();
-                    setHighlightedPlayerId(undefined);
                 });
 
                 SessionManagerHub.onShowVotes(() => {
@@ -273,9 +305,11 @@ function SessionPage() {
                 currentUserName={currentUser?.name}
                 code={code!}
                 notEnoughPlayers={notEnoughPlayers}
-                handleGame={handleGameStartOrStop}
+                startGame={handleGameStartOrStop}
                 handleShowVotes={handleShowVotes}
                 handleResetVotes={handleResetVotes}
+                handleResetGame={handleResetGame}
+                voteCount={votes?.filter((x) => !!x.vote).length || 0}
             />
             <GamePanel
                 players={players}

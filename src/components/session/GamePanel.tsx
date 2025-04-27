@@ -13,7 +13,6 @@ type GamePanelProps = {
 };
 
 function GamePanel({ players, gameStatus, votes, highlightedPlayerId }: GamePanelProps) {
-    console.log(gameStatus);
     return (
         <>
             <motion.div
@@ -44,7 +43,7 @@ function GamePanel({ players, gameStatus, votes, highlightedPlayerId }: GamePane
                             .map((player) => <li key={player.id}>{player.name}</li>)}
                     </ol>
                 </div>
-                <AnimatePresence mode="wait">
+                <AnimatePresence>
                     <Board
                         gameStatus={gameStatus}
                         votes={votes}

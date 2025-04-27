@@ -12,9 +12,11 @@ type InfoProps = {
     gameStatus?: string;
     code: string;
     notEnoughPlayers: boolean;
-    handleGame: (start: boolean) => void;
+    startGame: (start: boolean) => void;
     handleShowVotes: () => void;
     handleResetVotes: () => void;
+    handleResetGame: () => void;
+    voteCount: number;
 };
 
 function Info({
@@ -22,10 +24,12 @@ function Info({
     ownerName,
     code,
     notEnoughPlayers,
-    handleGame,
+    startGame,
     gameStatus,
     handleShowVotes,
     handleResetVotes,
+    handleResetGame,
+    voteCount,
 }: InfoProps) {
     const handleCopy = () => {
         navigator.clipboard.writeText(code!);
@@ -66,46 +70,59 @@ function Info({
                         ease: 'easeOut',
                     }}
                 >
-                    <motion.button
-                        className={classNames(
-                            styles.btn,
-                            gameStatus === 'active' || gameStatus === 'voted'
-                                ? styles.red
-                                : styles.green,
-                        )}
-                        type="button"
-                        disabled={notEnoughPlayers}
-                        onClick={() => handleGame(gameStatus === 'inactive')}
-                        data-tooltip-id="start-game-tooltip"
-                        data-tooltip-content="Not enough players to start the game"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.5 }}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        {gameStatus === 'inactive' ? 'START GAME' : 'STOP GAME'}
-                    </motion.button>
+                    {(gameStatus === 'voted' || gameStatus == 'active') && (
+                        <motion.button
+                            className={classNames(styles.btn, styles.red)}
+                            type="button"
+                            disabled={notEnoughPlayers}
+                            onClick={handleResetGame}
+                            data-tooltip-id="start-game-tooltip"
+                            data-tooltip-content="Not enough players to start the game"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.5 }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.5 }}
+                        >
+                            STOP
+                        </motion.button>
+                    )}
+
+                    {gameStatus === 'inactive' && (
+                        <motion.button
+                            className={classNames(styles.btn, styles.green)}
+                            type="button"
+                            disabled={notEnoughPlayers}
+                            onClick={() => startGame(true)}
+                            data-tooltip-id="start-game-tooltip"
+                            data-tooltip-content="Not enough players to start the game"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.5 }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.5 }}
+                        >
+                            START GAME
+                        </motion.button>
+                    )}
                     {notEnoughPlayers && <Tooltip id="start-game-tooltip" place="bottom" />}
                     <AnimatePresence>
-                        {gameStatus === 'active' && (
-                            <motion.button
-                                key="show"
-                                type="button"
-                                className={styles.showVotes}
-                                initial={{ opacity: 0, y: -20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -20 }}
-                                transition={{ duration: 0.5, ease: 'easeOut' }}
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.5 }}
-                                onClick={handleShowVotes}
-                            >
-                                SHOW VOTES
-                            </motion.button>
-                        )}
-                        {gameStatus === 'voted' ||
-                            (gameStatus === 'active' && (
+                        {gameStatus === 'active' && voteCount > 0 && (
+                            <>
+                                <motion.button
+                                    key="show"
+                                    type="button"
+                                    className={styles.showVotes}
+                                    initial={{ opacity: 0, y: -20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -20 }}
+                                    transition={{ duration: 0.5, ease: 'easeOut' }}
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.5 }}
+                                    onClick={handleShowVotes}
+                                >
+                                    SHOW VOTES
+                                </motion.button>
                                 <motion.button
                                     key="reset"
                                     type="button"
@@ -120,7 +137,8 @@ function Info({
                                 >
                                     RESET VOTES
                                 </motion.button>
-                            ))}
+                            </>
+                        )}
                     </AnimatePresence>
                 </motion.div>
             </div>
