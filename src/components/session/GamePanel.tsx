@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { UserRow } from '../../types/DbModels';
 import { UserVote } from '../../types/UserVote';
 import Board from './Board';
@@ -13,6 +13,7 @@ type GamePanelProps = {
 };
 
 function GamePanel({ players, gameStatus, votes, highlightedPlayerId }: GamePanelProps) {
+    console.log(gameStatus);
     return (
         <>
             <motion.div
@@ -43,11 +44,13 @@ function GamePanel({ players, gameStatus, votes, highlightedPlayerId }: GamePane
                             .map((player) => <li key={player.id}>{player.name}</li>)}
                     </ol>
                 </div>
-                <Board
-                    gameStatus={gameStatus}
-                    votes={votes}
-                    highlightedPlayerId={highlightedPlayerId}
-                />
+                <AnimatePresence mode="wait">
+                    <Board
+                        gameStatus={gameStatus}
+                        votes={votes}
+                        highlightedPlayerId={highlightedPlayerId}
+                    />
+                </AnimatePresence>
             </motion.div>
         </>
     );

@@ -16,69 +16,89 @@ function Vote({ vote, showVote, highlightTrigger }: VoteProps) {
     const [localHighlight, setLocalHighlight] = useState(false);
 
     useEffect(() => {
-        if (highlightTrigger) {
-            setLocalHighlight(true); // Trigger the highlight
+        if (highlightTrigger && !showVote) {
+            setLocalHighlight(true);
             const timer = setTimeout(() => {
-                setLocalHighlight(false); // Reset the highlight after 300ms
+                setLocalHighlight(false);
             }, 300);
 
-            return () => clearTimeout(timer); // Cleanup the timer on unmount or re-trigger
+            return () => clearTimeout(timer);
         }
-    }, [highlightTrigger]);
+    }, [highlightTrigger, showVote]);
 
     return (
-        <div className={classNames(styles.wrapper, showVote ? styles.visible : styles.concealed)}>
-            <AnimatePresence>
-                <motion.div
-                    className={styles.vote}
-                    layout
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{
-                        opacity: 1,
-                        y: 0,
-                        backgroundColor: localHighlight ? '#ffeb3b' : showVote ? '#fff' : '#2f2b2b',
-                    }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{
-                        duration: 0.3,
-                        ease: 'easeInOut',
-                    }}
-                >
-                    {showVote ? (
-                        <>
-                            <div
-                                className={classNames(
-                                    styles.rankAndSuit,
-                                    styles.top,
-                                    isRedSuit ? styles.red : styles.black,
-                                )}
-                            >
-                                <div className={styles.rank}>{vote.vote}</div>
-                                <div className={classNames(styles.suit, styles.suitLeft)}>
-                                    {vote.suit}
-                                </div>
+        <div className={classNames(styles.wrapper)}>
+            <AnimatePresence mode="wait" propagate>
+                {showVote ? (
+                    <motion.div
+                        key="revealed"
+                        className={styles.vote}
+                        initial={{ y: 400 }}
+                        animate={{
+                            y: 0,
+                            backgroundColor: localHighlight
+                                ? '#ffeb3b'
+                                : showVote
+                                  ? '#fff'
+                                  : '#2f2b2b',
+                        }}
+                        exit={{ y: 400 }}
+                        transition={{
+                            duration: 0.6,
+                            ease: 'easeInOut',
+                        }}
+                    >
+                        <div
+                            className={classNames(
+                                styles.rankAndSuit,
+                                styles.top,
+                                isRedSuit ? styles.red : styles.black,
+                            )}
+                        >
+                            <div className={styles.rank}>{vote.vote}</div>
+                            <div className={classNames(styles.suit, styles.suitLeft)}>
+                                {vote.suit}
                             </div>
-                            <div className={styles.name}>{vote.userName}</div>
-                            <div
-                                className={classNames(
-                                    styles.rankAndSuit,
-                                    styles.bottom,
-                                    styles.flip,
-                                    isRedSuit ? styles.red : styles.black,
-                                )}
-                            >
-                                <div className={classNames(styles.suit, styles.suitRight)}>
-                                    {vote.suit}
-                                </div>
-                                <div className={classNames(styles.rank, styles.rankRight)}>
-                                    {vote.vote}
-                                </div>
+                        </div>
+                        <div className={styles.name}>{vote.userName}</div>
+                        <div
+                            className={classNames(
+                                styles.rankAndSuit,
+                                styles.bottom,
+                                styles.flip,
+                                isRedSuit ? styles.red : styles.black,
+                            )}
+                        >
+                            <div className={classNames(styles.suit, styles.suitRight)}>
+                                {vote.suit}
                             </div>
-                        </>
-                    ) : (
+                            <div className={classNames(styles.rank, styles.rankRight)}>
+                                {vote.vote}
+                            </div>
+                        </div>
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        key="concealed"
+                        className={styles.vote}
+                        initial={{ y: 400 }}
+                        animate={{
+                            y: 0,
+                            backgroundColor: localHighlight
+                                ? '#ffeb3b'
+                                : showVote
+                                  ? '#fff'
+                                  : '#2f2b2b',
+                        }}
+                        exit={{ y: 400 }}
+                        transition={{
+                            duration: 0.6,
+                            ease: 'easeInOut',
+                        }}
+                    >
                         <div className={styles.nameConcealed}>{vote.userName}</div>
-                    )}
-                </motion.div>
+                    </motion.div>
+                )}
             </AnimatePresence>
         </div>
     );

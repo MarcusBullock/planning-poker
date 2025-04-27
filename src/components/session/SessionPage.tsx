@@ -77,9 +77,6 @@ function SessionPage() {
             return;
         }
 
-        console.log('Current session status:', session?.status);
-        console.log('Updating session status to:', start ? 'active' : 'inactive');
-
         if (session?.status === (start ? 'active' : 'inactive')) {
             console.warn('Session status is already', session?.status);
             return;
@@ -91,17 +88,13 @@ function SessionPage() {
                 status: start ? 'active' : 'inactive',
             });
 
-            refetchSession(); // Ensure session state is updated
+            refetchSession();
 
             if (SessionManagerHub.connectionState !== 'Connected') {
                 await SessionManagerHub.startConnection();
             }
 
             await SessionManagerHub.notifySessionActive(code!);
-            console.log(
-                'Notified SignalR of session status change:',
-                start ? 'active' : 'inactive',
-            );
         } catch (error) {
             console.error('Failed to update session or notify SignalR:', error);
         }
@@ -152,13 +145,11 @@ function SessionPage() {
     };
     useEffect(() => {
         if (highlightedPlayerId !== null) {
-            console.log(`Highlighting player: ${highlightedPlayerId}`);
             const timer = setTimeout(() => {
                 setHighlightedPlayerId(undefined);
-                console.log('Highlight reset after 1 second');
             }, 1000);
 
-            return () => clearTimeout(timer); // Cleanup timeout
+            return () => clearTimeout(timer);
         }
     }, [highlightedPlayerId]);
 
@@ -181,7 +172,7 @@ function SessionPage() {
         }
     };
 
-    const handleResetVotes = () => {
+    const handleResetVotes = async () => {
         if (session?.status === 'voted' || session?.status === 'active') {
             updateSession({
                 code: code!,
@@ -190,6 +181,15 @@ function SessionPage() {
             players?.forEach((player) => {
                 if (player.vote) updateUser({ id: player.id, vote: null });
             });
+        }
+
+        try {
+            if (SessionManagerHub.connectionState !== 'Connected') {
+                await SessionManagerHub.startConnection();
+            }
+            await SessionManagerHub.notifyResetVotes(code!);
+        } catch (error) {
+            console.error('Failed to notify SignalR wrt reset votes', error);
         }
     };
 
@@ -233,12 +233,20 @@ function SessionPage() {
                 });
 
                 SessionManagerHub.onPlayerHighlight((_sessionCode: string, userId: number) => {
-                    console.log('PLAYER HIGHLIGHT EVENT RECEIVED -------------------->');
                     refreshState();
                     setHighlightedPlayerId(userId);
                 });
 
                 SessionManagerHub.onSessionActive(() => {
+                    refreshState();
+                });
+
+                SessionManagerHub.onResetVotes(() => {
+                    refreshState();
+                    setHighlightedPlayerId(undefined);
+                });
+
+                SessionManagerHub.onShowVotes(() => {
                     refreshState();
                 });
             } else {
@@ -257,7 +265,6 @@ function SessionPage() {
         return <CreateUser sessionCode={code!} ownerName={sessionOwner?.name} />;
     }
 
-    console.log(`In the session page: HIGHLIGHTEDPLAYER CHANGED: ${highlightedPlayerId}`);
     return (
         <div className={styles.sessionPage}>
             <Info

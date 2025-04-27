@@ -10,13 +10,13 @@ const containerVariants = {
     hidden: {
         opacity: 1,
         transition: {
-            staggerChildren: 0.2, // Delay between each button's animation
+            staggerChildren: 0.2,
         },
     },
     visible: {
         opacity: 1,
         transition: {
-            staggerChildren: 0.2, // Delay between each button's animation
+            staggerChildren: 0.2,
         },
     },
 };

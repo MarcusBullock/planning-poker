@@ -9,7 +9,7 @@ const ThemeSwitch = () => {
     useEffect(() => {
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('theme', theme);
-        window.dispatchEvent(new Event('storage')); // Trigger storage event
+        window.dispatchEvent(new Event('storage'));
     }, [theme]);
 
     const toggleTheme = () => {

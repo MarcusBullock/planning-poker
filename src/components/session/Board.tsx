@@ -11,7 +11,7 @@ type BoardProps = {
 
 function Board({ gameStatus, votes, highlightedPlayerId }: BoardProps) {
     return (
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
             {(gameStatus === 'active' || gameStatus === 'voted') && (
                 <motion.div
                     className={styles.board}
@@ -23,23 +23,21 @@ function Board({ gameStatus, votes, highlightedPlayerId }: BoardProps) {
                         ease: 'easeInOut',
                     }}
                 >
-                    {votes
-                        ?.sort((a, b) => a.userName?.localeCompare(b.userName))
-                        .map((vote) => {
-                            console.log(
-                                `highlightedPlayerId === vote.userId: ${highlightedPlayerId === vote.userId}`,
-                            );
-                            return (
-                                vote.vote && (
-                                    <Vote
-                                        key={vote.userId}
-                                        vote={vote}
-                                        showVote={gameStatus === 'voted'}
-                                        highlightTrigger={highlightedPlayerId === vote.userId}
-                                    />
-                                )
-                            );
-                        })}
+                    <AnimatePresence mode="wait">
+                        {votes
+                            ?.sort((a, b) => a.userName?.localeCompare(b.userName))
+                            .map(
+                                (vote) =>
+                                    vote.vote && (
+                                        <Vote
+                                            key={vote.userId}
+                                            vote={vote}
+                                            showVote={gameStatus === 'voted'}
+                                            highlightTrigger={highlightedPlayerId === vote.userId}
+                                        />
+                                    ),
+                            )}
+                    </AnimatePresence>
                 </motion.div>
             )}
         </AnimatePresence>

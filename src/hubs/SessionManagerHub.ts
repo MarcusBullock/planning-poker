@@ -82,9 +82,6 @@ class SessionManagerHub {
     async notifyPlayerHighlight(sessionCode: string, userId: number): Promise<void> {
         try {
             if (this.connection.state === 'Connected') {
-                console.log(
-                    `Invoking PlayerHighlight on hub: sessionCode=${sessionCode}, userId=${userId}`,
-                );
                 await this.connection.invoke('PlayerHighlight', sessionCode, userId);
             } else {
                 console.error('Cannot notify hub: Connection is not in the "Connected" state.');
