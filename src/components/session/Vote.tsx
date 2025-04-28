@@ -16,7 +16,7 @@ function Vote({ vote, showVote, highlightTrigger }: VoteProps) {
     const [localHighlight, setLocalHighlight] = useState(false);
 
     useEffect(() => {
-        if (highlightTrigger) {
+        if (highlightTrigger && !showVote) {
             setLocalHighlight(true);
             const timer = setTimeout(() => {
                 setLocalHighlight(false);
@@ -36,11 +36,12 @@ function Vote({ vote, showVote, highlightTrigger }: VoteProps) {
                         initial={{ y: 400 }}
                         animate={{
                             y: 0,
-                            backgroundColor: localHighlight
-                                ? '#ffeb3b'
-                                : showVote
-                                  ? '#fff'
-                                  : '#2f2b2b',
+                            backgroundColor:
+                                localHighlight && !showVote
+                                    ? '#ffeb3b'
+                                    : showVote
+                                      ? '#fff'
+                                      : '#2f2b2b',
                         }}
                         exit={{ y: 400 }}
                         transition={{

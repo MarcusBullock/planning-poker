@@ -67,7 +67,7 @@ function SessionPage() {
     const notEnoughPlayers = !!players && players.length == 1;
 
     const handleGameStartOrStop = async (start: boolean) => {
-        if (notEnoughPlayers) {
+        if (notEnoughPlayers && start) {
             toast.warn('You need at least 2 players to start a game', {
                 position: 'top-right',
                 autoClose: 1000,
@@ -136,6 +136,14 @@ function SessionPage() {
                 }
                 await SessionManagerHub.notifyVoteCast(code!, currentUser?.id || 0);
                 await SessionManagerHub.notifyPlayerHighlight(code!, currentUser?.id || 0);
+
+                console.log('1111');
+                if (session?.status === 'active' && players && votes && players.length > 1) {
+                    console.log('2222');
+                    if (votes.filter((x) => x.vote !== null).length === players.length) {
+                        await SessionManagerHub.notifyShowVotes(code!);
+                    }
+                }
             } catch (error) {
                 console.error('Failed to notify SignalR wrt updated status:', error);
             }
@@ -154,7 +162,7 @@ function SessionPage() {
         }
     }, [highlightedPlayerId]);
 
-    const handleShowVotes = async () => {
+    const handleShowVotes = useCallback(async () => {
         if (session?.status === 'active' && players) {
             const hasVotes = players.filter((player) => player.vote !== null).length >= 2;
             if (hasVotes) {
@@ -181,7 +189,7 @@ function SessionPage() {
                 console.error('Failed to notify SignalR wrt updated status:', error);
             }
         }
-    };
+    }, [session?.status, players, code, updateSession]);
 
     const handleResetVotes = async () => {
         if (session?.status === 'voted' || session?.status === 'active') {
@@ -292,6 +300,15 @@ function SessionPage() {
             SessionManagerHub.stopConnection();
         };
     }, [code, refreshState]);
+
+    useEffect(() => {
+        if (session?.status === 'active' && players && votes && players.length > 1) {
+            if (votes.length === players.length) {
+                const allVotesCast = votes.every((v) => v.vote !== null && v.vote !== undefined);
+                if (allVotesCast) handleShowVotes();
+            }
+        }
+    }, [session?.status, players, votes, handleShowVotes]);
 
     if (!userId) {
         return <CreateUser sessionCode={code!} ownerName={sessionOwner?.name} />;

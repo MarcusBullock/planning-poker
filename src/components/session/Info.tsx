@@ -108,36 +108,36 @@ function Info({
                     {notEnoughPlayers && <Tooltip id="start-game-tooltip" place="bottom" />}
                     <AnimatePresence>
                         {gameStatus === 'active' && voteCount > 0 && (
-                            <>
-                                <motion.button
-                                    key="show"
-                                    type="button"
-                                    className={styles.showVotes}
-                                    initial={{ opacity: 0, y: -20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                    transition={{ duration: 0.5, ease: 'easeOut' }}
-                                    whileHover={{ scale: 1.1 }}
-                                    whileTap={{ scale: 0.5 }}
-                                    onClick={handleShowVotes}
-                                >
-                                    SHOW VOTES
-                                </motion.button>
-                                <motion.button
-                                    key="reset"
-                                    type="button"
-                                    className={styles.resetVotes}
-                                    initial={{ opacity: 0, y: -20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                    transition={{ duration: 0.5, ease: 'easeOut' }}
-                                    whileHover={{ scale: 1.1 }}
-                                    whileTap={{ scale: 0.5 }}
-                                    onClick={handleResetVotes}
-                                >
-                                    RESET VOTES
-                                </motion.button>
-                            </>
+                            <motion.button
+                                key="show"
+                                type="button"
+                                className={styles.showVotes}
+                                initial={{ opacity: 0, y: -20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                transition={{ duration: 0.5, ease: 'easeOut' }}
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.5 }}
+                                onClick={handleShowVotes}
+                            >
+                                SHOW VOTES
+                            </motion.button>
+                        )}
+                        {(gameStatus === 'voted' || gameStatus === 'active') && voteCount > 0 && (
+                            <motion.button
+                                key="reset"
+                                type="button"
+                                className={styles.resetVotes}
+                                initial={{ opacity: 0, y: -20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                transition={{ duration: 0.5, ease: 'easeOut' }}
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.5 }}
+                                onClick={handleResetVotes}
+                            >
+                                RESET VOTES
+                            </motion.button>
                         )}
                     </AnimatePresence>
                 </motion.div>
