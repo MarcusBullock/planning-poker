@@ -4,6 +4,7 @@ import { UserVote } from '../../types/UserVote';
 import Board from './Board';
 import classNames from 'classnames';
 import styles from './GamePanel.module.scss';
+import Results from './Results';
 
 type GamePanelProps = {
     players?: UserRow[];
@@ -31,6 +32,7 @@ function GamePanel({ players, gameStatus, votes, highlightedPlayerId }: GamePane
                     gameStatus === 'active' || gameStatus === 'voted'
                         ? styles.active
                         : styles.inactive,
+                    gameStatus === 'voted' ? styles.voted : '',
                 )}
             >
                 <div className={styles.playerList}>
@@ -51,6 +53,9 @@ function GamePanel({ players, gameStatus, votes, highlightedPlayerId }: GamePane
                     />
                 </AnimatePresence>
             </motion.div>
+            <AnimatePresence>
+                <Results gameStatus={gameStatus} votes={votes} />
+            </AnimatePresence>
         </>
     );
 }

@@ -3,8 +3,6 @@
 
 TODO - 
 
-- when all votes are cast, automatically show votes
-
 - add vote metrics / analysis 
 
 - start visible timer when game starts.
