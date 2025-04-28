@@ -170,15 +170,7 @@ function SessionPage() {
                     code: code!,
                     status: 'voted',
                 });
-            } else {
-                toast.warn('Need at least 2 votes', {
-                    position: 'top-right',
-                    autoClose: 1000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                });
-                return;
-            }
+            } else return;
 
             try {
                 if (SessionManagerHub.connectionState !== 'Connected') {
@@ -192,21 +184,21 @@ function SessionPage() {
     }, [session?.status, players, code, updateSession]);
 
     const handleResetVotes = async () => {
-        if (session?.status === 'voted' || session?.status === 'active') {
-            updateSession({
-                code: code!,
-                status: 'active',
-            });
-            players?.forEach((player) => {
-                if (player.vote) updateUser({ id: player.id, vote: null });
-            });
-        }
+        players?.forEach((player) => {
+            if (player.vote) updateUser({ id: player.id, vote: null });
+        });
+
+        updateSession({
+            code: code!,
+            status: 'active',
+        });
 
         try {
             if (SessionManagerHub.connectionState !== 'Connected') {
                 await SessionManagerHub.startConnection();
             }
             await SessionManagerHub.notifyResetVotes(code!);
+            await SessionManagerHub.notifySessionActive(code!);
         } catch (error) {
             console.error('Failed to notify SignalR wrt reset votes', error);
         }
@@ -302,13 +294,25 @@ function SessionPage() {
     }, [code, refreshState]);
 
     useEffect(() => {
-        if (session?.status === 'active' && players && votes && players.length > 1) {
-            if (votes.length === players.length) {
-                const allVotesCast = votes.every((v) => v.vote !== null && v.vote !== undefined);
-                if (allVotesCast) handleShowVotes();
+        let timeout: NodeJS.Timeout | undefined;
+        if (
+            session?.status === 'active' &&
+            Array.isArray(players) &&
+            Array.isArray(votes) &&
+            players.length > 1 &&
+            votes.length === players.length
+        ) {
+            const allVoted = votes.every((v) => v.vote !== null && v.vote !== undefined);
+            if (allVoted) {
+                timeout = setTimeout(() => {
+                    handleShowVotes();
+                }, 1000);
             }
         }
-    }, [session?.status, players, votes, handleShowVotes]);
+        return () => {
+            if (timeout) clearTimeout(timeout);
+        };
+    }, [session?.status, players?.length, votes?.length, players, votes, handleShowVotes]);
 
     if (!userId) {
         return <CreateUser sessionCode={code!} ownerName={sessionOwner?.name} />;
