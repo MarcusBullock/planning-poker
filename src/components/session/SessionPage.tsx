@@ -300,7 +300,7 @@ function SessionPage() {
             Array.isArray(players) &&
             Array.isArray(votes) &&
             players.length > 1 &&
-            votes.length === players.length
+            votes.filter((x) => x.vote !== null).length === players.length
         ) {
             const allVoted = votes.every((v) => v.vote !== null && v.vote !== undefined);
             if (allVoted) {

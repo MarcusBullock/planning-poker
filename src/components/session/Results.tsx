@@ -67,7 +67,7 @@ function Results({ gameStatus, votes }: ResultsProps) {
             <motion.div
                 className={styles.results}
                 initial={{ height: 0 }}
-                animate={{ height: 150 }}
+                animate={{ height: 'fit-content' }}
                 exit={{ height: 150 }}
                 transition={{
                     duration: 0.5,
@@ -106,45 +106,59 @@ function Results({ gameStatus, votes }: ResultsProps) {
                             >
                                 {results.isTie ? 'TIE:' : 'WINNER:'}
                                 <span className={styles.winningVote}>
-                                    {results.winningVotes.join(',')}
+                                    {results.winningVotes
+                                        .sort((a, b) => a - b)
+                                        .map(
+                                            (vote, idx) =>
+                                                vote !== null && (
+                                                    <span
+                                                        key={idx}
+                                                        className={styles.winningVoteCircle}
+                                                    >
+                                                        {vote}
+                                                    </span>
+                                                ),
+                                        )}
                                 </span>
                             </div>
-                            {votes.every((x) => x.vote !== null) && (
-                                <div className={styles.breakdown}>
-                                    <h5>Breakdown</h5>
-                                    <div className={styles.voteCounts}>
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>Vote</th>
-                                                    <th>Count</th>
-                                                    <th>%</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {Object.entries(results.counts)
-                                                    .sort(
-                                                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                                                        ([_XY, countA], [_X, countB]) =>
-                                                            countB - countA,
-                                                    )
-                                                    .map(([vote, count]) => (
-                                                        <tr key={vote}>
-                                                            <td>{vote}</td>
-                                                            <td>{count}</td>
-                                                            <td>
-                                                                {(
-                                                                    (count / results.totalVotes) *
-                                                                    100
-                                                                ).toFixed(0)}
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                            <div className={styles.breakdown}>
+                                <h5>Breakdown</h5>
+                                <div className={styles.voteCounts}>
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Vote</th>
+                                                <th>Count</th>
+                                                <th>%</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {Object.entries(results.counts)
+                                                .sort(
+                                                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                                    ([_XY, countA], [_X, countB]) =>
+                                                        countB - countA,
+                                                )
+                                                .map(
+                                                    ([vote, count]) =>
+                                                        vote !== 'null' && (
+                                                            <tr key={vote}>
+                                                                <td>{vote}</td>
+                                                                <td>{count}</td>
+                                                                <td>
+                                                                    {(
+                                                                        (count /
+                                                                            results.totalVotes) *
+                                                                        100
+                                                                    ).toFixed(0)}
+                                                                </td>
+                                                            </tr>
+                                                        ),
+                                                )}
+                                        </tbody>
+                                    </table>
                                 </div>
-                            )}
+                            </div>
                         </motion.div>
                     )}
                 </AnimatePresence>

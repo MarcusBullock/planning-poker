@@ -22,7 +22,7 @@ const containerVariants = {
 };
 
 function VoteControls({ onVote }: VoteControlsProps) {
-    const voteOptions = [1, 2, 3, 5, 8, 13, 21];
+    const voteOptions = [1, 2, 3, 5, 8, 13];
 
     return (
         <motion.div
