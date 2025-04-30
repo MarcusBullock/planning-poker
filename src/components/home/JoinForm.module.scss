@@ -28,7 +28,7 @@
             font-size: 34px;
         }
 
-        button {
+        a {
             border-radius: 10px;
             border: transparent;
             padding: 15px 40px;
@@ -37,6 +37,7 @@
             color: white;
             font-family: 'CardCharacters', sans-serif;
             box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+            text-decoration: none;
 
             &:hover {
                 background-color: #511b1b;

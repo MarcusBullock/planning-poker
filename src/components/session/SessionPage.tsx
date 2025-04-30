@@ -23,18 +23,32 @@ import { UserVote } from '../../types/UserVote';
 function SessionPage() {
     const { code } = useParams<{ code: string }>();
     const navigate = useNavigate();
-    const { data: session, refetch: refetchSession, isError } = useGetSession(code!);
+    const { data: session, refetch: refetchSession, isError: sessionError } = useGetSession(code!);
 
     useEffect(() => {
-        if (isError) {
+        if (sessionError) {
             navigate('/');
+            toast.warn('Invalid session', {
+                position: 'top-right',
+                autoClose: 1000,
+                hideProgressBar: true,
+                closeOnClick: true,
+            });
         }
-    }, [isError, navigate]);
+    }, [sessionError, navigate, session]);
 
     const [highlightedPlayerId, setHighlightedPlayerId] = useState<number | undefined>(undefined);
-    const { data: sessionOwner } = useGetSessionOwner(code!);
-    const { data: players, refetch: refetchPlayers } = useGetSessionPlayers(code!);
-    const { data: votes, refetch: refetchVotes } = useGetVotes(code!);
+    const { data: sessionOwner, isError: sessionOwnerError } = useGetSessionOwner(code!);
+    const {
+        data: players,
+        refetch: refetchPlayers,
+        isError: playersError,
+    } = useGetSessionPlayers(code!);
+    const { data: votes, refetch: refetchVotes, isError: votesError } = useGetVotes(code!);
+
+    if (sessionOwnerError || playersError || votesError)
+        console.log('session page data fetch error');
+
     const { userId, setUserId } = useCurrentUser();
 
     const queryClient = useQueryClient();
@@ -314,7 +328,7 @@ function SessionPage() {
         };
     }, [session?.status, players?.length, votes?.length, players, votes, handleShowVotes]);
 
-    if (!userId) {
+    if (!userId && session !== null && session !== undefined) {
         return <CreateUser sessionCode={code!} ownerName={sessionOwner?.name} />;
     }
 
