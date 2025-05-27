@@ -5,7 +5,7 @@ class SessionManagerHub {
 
     constructor() {
         this.connection = new HubConnectionBuilder()
-            .withUrl('https://planning-poker-backend-9bqi.onrender.com')
+            .withUrl('https://planning-poker-backend-9bqi.onrender.com/realtime')
             .withAutomaticReconnect()
             .build();
     }
